@@ -6,17 +6,18 @@ import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
-case class CourseGetAll(courses: Seq[Course])
-object CourseGetAll {
-  implicit val courseGetAllJsonFormat = Json.format[CourseGetAll]
-}
-
-
 class CourseController @Inject() (val controllerComponents: ControllerComponents, courseRepo: CourseRepository)
-                                 (implicit ec: ExecutionContext)
-  extends BaseController {
-  def getCourses = Action.async { request =>
-    courseRepo.getAll().map(courses => Ok(Json.toJson(courses)))
+                                 (implicit ec: ExecutionContext) extends BaseController {
+  def listCourses = Action.async {
+    println("1")
+    val l = courseRepo.list()
+    println("2")
+    l.map(
+      courses => Ok(
+        Json.toJson(courses)
+        //"asd" + courses.head.name
+      )
+    )
   }
 
 }

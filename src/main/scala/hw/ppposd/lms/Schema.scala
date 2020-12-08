@@ -6,6 +6,8 @@ import slick.dbio.DBIO
 import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.H2Profile.api._
 
+import scala.concurrent.Future
+
 object Schema {
   lazy val db = Database.forConfig("db")
 
@@ -15,10 +17,9 @@ object Schema {
   val courses = TableQuery[CourseTable]
   val groups = TableQuery[GroupTable]
 
-  def createSchema() = {
+  def createSchema(): Future[Unit] = {
     val schema = courses.schema ++ groups.schema
     val setup = DBIO.seq{schema.create}
     db.run(setup)
   }
-
 }
