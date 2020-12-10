@@ -1,8 +1,22 @@
 package hw.ppposd.lms
 
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+
+import scala.concurrent.ExecutionContext
+import scala.io.StdIn
 
 object Application extends App {
+  implicit val system: ActorSystem = ActorSystem("lms-system")
+  implicit val ec: ExecutionContext = system.dispatcher
+
   Schema.createSchema()
 
-  // todo
+  val port = 8080
+  val binding = Http().newServerAt("localhost", port).bind(RootRouting.route)
+
+  println(s"Server running at http://localhost:$port/")
+  println("Press RETURN to stop")
+  StdIn.readLine()
+  binding.flatMap(_.unbind()).onComplete(_ => system.terminate())
 }

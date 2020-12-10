@@ -19,7 +19,7 @@ object Schema {
 
   def createSchema(): Future[Unit] = {
     val schema = courses.schema ++ groups.schema
-    val setup = DBIO.seq{schema.create}
+    val setup = DBIO.seq{schema.createIfNotExists}
     db.run(setup)
   }
 }

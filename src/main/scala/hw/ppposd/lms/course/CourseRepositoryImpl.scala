@@ -1,7 +1,6 @@
 package hw.ppposd.lms.course
 
 import hw.ppposd.lms.util.Id
-import javax.inject.{Inject, Singleton}
 import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.Future
@@ -12,8 +11,7 @@ trait CourseRepository {
   def list(): Future[Seq[Course]]
 }
 
-@Singleton
-class CourseRepositoryImpl @Inject() extends CourseRepository {
+class CourseRepositoryImpl extends CourseRepository {
   import hw.ppposd.lms.Schema._
 
   override def create(name: String, description: String): Future[Id[Course]] = {
