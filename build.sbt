@@ -13,6 +13,7 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.0"
 libraryDependencies += "com.typesafe.slick" %% "slick" % "3.3.2"
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3"
+libraryDependencies += "de.heikoseeberger" %% "akka-http-play-json" % "1.31.0"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % Test
 libraryDependencies += "org.scalamock" %% "scalamock" % "4.4.0" % Test
