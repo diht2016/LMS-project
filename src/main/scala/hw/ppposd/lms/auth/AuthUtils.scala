@@ -22,6 +22,10 @@ object AuthUtils {
     password.length >= 10
   }
 
+  def isEmailValid(email: String): Boolean = {
+    email.matches("^\\S+@\\S+.\\S+$")
+  }
+
   def randomSession: String = randomString(64)
 
   def randomVerificationCode: String = randomString(32)

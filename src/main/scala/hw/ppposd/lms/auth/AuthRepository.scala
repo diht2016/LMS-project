@@ -1,5 +1,7 @@
 package hw.ppposd.lms.auth
 
+import slick.jdbc.H2Profile.api._
+import hw.ppposd.lms.auth.AuthUtils._
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 
@@ -9,11 +11,11 @@ trait AuthRepository {
   def createSession(userId: Id[User]): Future[String]
   def findUserIdBySession(session: String): Future[Option[Id[User]]]
   def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]]
-  def destroySession(session: String): Future[Unit]
+  def destroySession(session: String): Future[Int]
 
-  def createVerification(fullName: String): Future[String]
+  def createVerification(userId: Id[User]): Future[String]
   def findUserIdByVerification(code: String): Future[Option[Id[User]]]
-  def destroyVerification(session: String): Future[Unit]
+  def destroyVerification(code: String): Future[Int]
 
   def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit]
   def getPasswordHash(userId: Id[User]): Future[String]
@@ -21,23 +23,36 @@ trait AuthRepository {
 }
 
 class AuthRepositoryImpl extends AuthRepository {
-  override def createSession(userId: Id[User]): Future[String] = ???
+  import hw.ppposd.lms.Schema._
 
-  override def findUserIdBySession(session: String): Future[Option[Id[User]]] = ???
+  override def createSession(userId: Id[User]): Future[String] =
+    db.run((sessions returning sessions.map(_.session))
+      += Session(randomSession, userId))
 
-  override def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]] = ???
+  override def findUserIdBySession(session: String): Future[Option[Id[User]]] =
+    db.run(sessions.filter(_.session === session).map(_.userId).result.headOption)
 
-  override def destroySession(session: String): Future[Unit] = ???
+  override def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]] =
+    db.run(users.filter(u => u.email === email && u.passwordHash === passwordHash)
+      .map(_.id).result.headOption)
 
-  override def createVerification(fullName: String): Future[String] = ???
+  override def destroySession(session: String): Future[Int] =
+    db.run(sessions.filter(_.session === session).delete)
 
-  override def findUserIdByVerification(code: String): Future[Option[Id[User]]] = ???
+  override def createVerification(userId: Id[User]): Future[String] =
+    db.run((verifications returning verifications.map(_.code))
+      += Verification(randomVerificationCode, userId))
 
-  override def destroyVerification(session: String): Future[Unit] = ???
+  override def findUserIdByVerification(code: String): Future[Option[Id[User]]] =
+    db.run(verifications.filter(_.code === code).map(_.userId).result.headOption)
+
+  override def destroyVerification(code: String): Future[Int] =
+    db.run(verifications.filter(_.code === code).delete)
 
   override def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit] = ???
 
-  override def getPasswordHash(userId: Id[User]): Future[String] = ???
+  override def getPasswordHash(userId: Id[User]): Future[String] =
+    db.run(users.filter(_.id === userId).map(_.passwordHash).result.head)
 
   override def setPasswordHash(userId: Id[User], passwordHash: String): Future[Unit] = ???
 }
