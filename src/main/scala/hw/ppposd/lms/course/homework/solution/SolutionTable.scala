@@ -1,12 +1,11 @@
-package hw.ppposd.lms.solution
+package hw.ppposd.lms.course.homework.solution
 
 import java.sql.Timestamp
 
-import hw.ppposd.lms.homework.Homework
+import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 import slick.jdbc.H2Profile.api._
-
 
 case class Solution(homeworkId: Id[Homework], studentId: Id[User], text: String, date: Timestamp)
 

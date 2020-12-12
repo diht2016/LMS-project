@@ -8,11 +8,16 @@ import scala.concurrent.Future
 trait AuthRepository {
   def createSession(userId: Id[User]): Future[String]
   def findUserIdBySession(session: String): Future[Option[Id[User]]]
-  def findUserIdByAuth(username: String, passwordHash: String): Future[Option[Id[User]]]
-  // def destroySession(session: String): Future[Unit]
+  def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]]
+  def destroySession(session: String): Future[Unit]
 
   def createVerification(fullName: String): Future[String]
-  def findFullNameByVerification(code: String): Future[Option[String]]
+  def findUserIdByVerification(code: String): Future[Option[Id[User]]]
+  def destroyVerification(session: String): Future[Unit]
+
+  def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit]
+  def getPasswordHash(userId: Id[User]): Future[String]
+  def setPasswordHash(userId: Id[User], passwordHash: String): Future[Unit]
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -20,9 +25,19 @@ class AuthRepositoryImpl extends AuthRepository {
 
   override def findUserIdBySession(session: String): Future[Option[Id[User]]] = ???
 
-  override def findUserIdByAuth(username: String, passwordHash: String): Future[Option[Id[User]]] = ???
+  override def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]] = ???
+
+  override def destroySession(session: String): Future[Unit] = ???
 
   override def createVerification(fullName: String): Future[String] = ???
 
-  override def findFullNameByVerification(code: String): Future[Option[String]] = ???
+  override def findUserIdByVerification(code: String): Future[Option[Id[User]]] = ???
+
+  override def destroyVerification(session: String): Future[Unit] = ???
+
+  override def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit] = ???
+
+  override def getPasswordHash(userId: Id[User]): Future[String] = ???
+
+  override def setPasswordHash(userId: Id[User], passwordHash: String): Future[Unit] = ???
 }

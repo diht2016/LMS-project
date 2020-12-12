@@ -1,4 +1,4 @@
-package hw.ppposd.lms.homework
+package hw.ppposd.lms.course.homework
 
 import java.sql.Timestamp
 
@@ -13,7 +13,7 @@ case class Homework(homeworkId: Id[Homework],
                     startDate: Timestamp,
                     deadlineDate: Timestamp)
 
-class HomeworkTable(tag: Tag) extends Table[Homework](tag, "homworks"){
+class HomeworkTable(tag: Tag) extends Table[Homework](tag, "homeworks"){
   def homeworkId = column[Id[Homework]]("homework_id", O.PrimaryKey, O.AutoInc)
   def courseId = column[Id[Course]]("course_id")
   def name = column[String]("name")

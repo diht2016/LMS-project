@@ -14,10 +14,7 @@ class CourseController(courseRepo: CourseRepository) extends Controller {
     } ~ pathPrefix(Segment) { courseId => concat (
       // todo
       complete(s"extracted courseId = ${courseId}")
-    )} ~ complete {
-      println(extractUnmatchedPath.toString)
-      "1"
-    }
+    )}
   }
 
   def listCourses(userId: Id[User]): Future[Seq[Course]] = {

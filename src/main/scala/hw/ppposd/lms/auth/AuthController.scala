@@ -1,7 +1,7 @@
 package hw.ppposd.lms.auth
 
 import akka.http.scaladsl.model.headers.HttpCookie
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directive1, Route}
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
 import hw.ppposd.lms.user.User
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthController(authRepo: AuthRepository) extends Controller {
   import AuthController._
-  def route(implicit ec: ExecutionContext): Route = concat (
+  def route(implicit ec: ExecutionContext): Route = pathPrefix("auth") { concat (
     path("login") {
       post { entity(as[LoginEntity]) { entity => onSuccess(login(entity)) {
         case Some(session) => setCookie(HttpCookie("SESSION", value = session)) { complete("success") }
@@ -23,17 +23,27 @@ class AuthController(authRepo: AuthRepository) extends Controller {
       post { entity(as[RegisterEntity]) { entity => register(entity) } }
     },
     path("change-password") {
-      post { entity(as[ChangePasswordEntity]) { entity => changePassword(entity) } }
+      userSession { userId =>
+        post { entity(as[ChangePasswordEntity]) { entity => changePassword(userId, entity) } }
+      }
     },
-  )
+  )}
 
-  def sessionToUserId(session: String): Future[Option[Id[User]]] = {
+  def userSession(innerRoute: Id[User] => Route)(implicit ec: ExecutionContext): Route =
+    cookie("SESSION") { session =>
+      onSuccess(sessionToUserId(session.value)) {
+        case Some(userId) => innerRoute(userId)
+        case None => complete(401, "invalid session")
+      }
+    }
+
+  private def sessionToUserId(session: String): Future[Option[Id[User]]] = {
     authRepo.findUserIdBySession(session)
   }
 
   private def login(entity: LoginEntity)(implicit ec: ExecutionContext): Future[Option[String]] = {
     val passwordHash = AuthUtils.hashPassword(entity.password)
-    val userIdOptFuture = authRepo.findUserIdByAuth(entity.username, passwordHash)
+    val userIdOptFuture = authRepo.findUserIdByAuthPair(entity.email, passwordHash)
     userIdOptFuture.flatMap {
       case Some(userId) => authRepo.createSession(userId).map(Some(_))
       case None => Future.successful(None)
@@ -44,16 +54,16 @@ class AuthController(authRepo: AuthRepository) extends Controller {
     ???
   }
 
-  private def changePassword(entity: ChangePasswordEntity): Future[Unit] = {
+  private def changePassword(userId: Id[User], entity: ChangePasswordEntity): Future[Unit] = {
     ???
   }
 }
 
 object AuthController extends PlayJsonSupport {
-  final case class LoginEntity(username: String, password: String)
+  final case class LoginEntity(email: String, password: String)
   implicit val loginFormat: Reads[LoginEntity] = Json.reads[LoginEntity]
 
-  final case class RegisterEntity(verificationCode: String, username: String, password: String)
+  final case class RegisterEntity(verificationCode: String, email: String, password: String)
   implicit val registerFormat: Reads[RegisterEntity] = Json.reads[RegisterEntity]
 
   final case class ChangePasswordEntity(oldPassword: String, newPassword: String)

@@ -8,11 +8,11 @@
 - User ({user.id}, fullName, email, password, group.id)
 - CourseTeacher ({course.id, user#teacher.id})
 - CourseTutor ({course.id, user#student.id})
-- Student ({user#student.id}, yearOfEnrollment, degree, studyForm, learningBase)
-- PersonalInfo ({user.id}, phoneNumber, city, description, vk, facebook, linkedin, instagram)
+- StudentData ({user#student.id}, yearOfEnrollment, degree, studyForm, learningBase)
+- PersonalData ({user.id}, phoneNumber, city, description, vk, facebook, linkedin, instagram)
 - Material ({material.id}, course.id, name, description, creationDate)
 - Homework ({homework.id}, course.id, name, description, startDate, deadlineDate)
-- Solution (:homework.id, user#student.id}, text, date)
+- Solution ({homework.id, user#student.id}, text, date)
 
 ## Enums
 - Degree [Bachelor, Specialist, Master]
@@ -32,13 +32,13 @@
   - register with verificationCode (set email and password, password should be hard)
     - `POST /auth/register (verificationCode, email, password)`
 * User
-  - view own User data and PersonalInfo
+  - view own User data and PersonalData
     - `GET /users/me`
   - change password using old password (password should be hard)
     - `PUT /auth/change-password (oldPassword, newPassword)`
-  - edit own PersonalInfo (phone and links are validated)
-    - `PUT /users/me/personal-info (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
-  - view other User data and PersonalInfo (except learningBase)
+  - edit own PersonalData (phone and links are validated)
+    - `PUT /users/me/personal-data (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
+  - view other User data and PersonalData (except learningBase)
     - `GET /users/{user.id}`
 * Student
   - view list of group courses
@@ -63,10 +63,10 @@
     - `GET /courses/{course.id}/homeworks`
 * Teacher
   - manage Tutors (add, delete)
-    - `CREATE /courses/{course.id}/tutors (user.id)`
+    - `POST /courses/{course.id}/tutors (user.id)`
     - `DELETE /courses/{course.id}/tutors/{user.id}`
   - manage Homeworks (add, edit, delete)
-    - `CREATE /courses/{course.id}/homeworks (name, description, startDate, deadlineDate)`
+    - `POST /courses/{course.id}/homeworks (name, description, startDate, deadlineDate)`
     - `PUT /courses/{course.id}/homeworks/{homeworks.id} (name, description, startDate, deadlineDate)`
     - `DELETE /courses/{course.id}/homeworks/{homeworks.id}`
   - view full list of Homeworks
@@ -80,6 +80,6 @@
     - `POST /courses/{course.id}/homeworks/{homeworks.id}/solutions (text)`
 * Tutor & Teacher
   - manage Materials (add, edit, delete)
-    - `CREATE /courses/{course.id}/materials (name, description)`
+    - `POST /courses/{course.id}/materials (name, description)`
     - `PUT /courses/{course.id}/materials/{materials.id} (name, description)`
     - `DELETE /courses/{course.id}/materials/{materials.id}`
