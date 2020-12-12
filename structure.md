@@ -3,16 +3,16 @@
 ## Tables
 - Group ({group.id}, name, department, courseNumber)
 - Course ({course.id}, name, description)
-- GroupCourse ({:group.id, course.id})
+- GroupCourse ({group.id, course.id})
 - Verification ({verificationCode}, fullName)
-- User ({user.id}, fullName, email, password, userType)
-- CourseTeacher ({:course.id, user#teacher.id})
-- CourseTutor ({:course.id, user#student.id})
-- Student ({user#student.id}, :group.id, yearOfEnrollment, degree, studyForm, learningBase)
+- User ({user.id}, fullName, email, password, group.id)
+- CourseTeacher ({course.id, user#teacher.id})
+- CourseTutor ({course.id, user#student.id})
+- Student ({user#student.id}, yearOfEnrollment, degree, studyForm, learningBase)
 - PersonalInfo ({user.id}, phoneNumber, city, description, vk, facebook, linkedin, instagram)
-- Material ({material.id}, :course.id, name, description, creationDate)
-- Homework ({homework.id}, :course.id, name, description, startDate, deadlineDate)
-- Solution ({:homework.id, user#student.id}, text, date)
+- Material ({material.id}, course.id, name, description, creationDate)
+- Homework ({homework.id}, course.id, name, description, startDate, deadlineDate)
+- Solution (:homework.id, user#student.id}, text, date)
 
 ## Enums
 - Degree [Bachelor, Specialist, Master]
