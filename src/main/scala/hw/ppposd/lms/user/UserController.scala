@@ -16,7 +16,7 @@ class UserController(userRepo: UserRepository)(implicit ec: ExecutionContext) ex
       }
     } ~ pathPrefix(Segment) { userId =>
       get {
-        complete(s"show other user info, extracted userId = ${userId}") // todo
+        complete(s"show other user info, extracted userId = $userId") // todo
       }
     }
   }

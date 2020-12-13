@@ -16,10 +16,10 @@ class GroupController(accessService: AccessService)
     }
   }
 
-  def listGroupStudents(userId: Id[User]): Future[Option[Seq[Id[User]]]] = {
+  def listGroupStudents(userId: Id[User]): Future[Seq[Id[User]]] = {
     accessService.matchUserType(userId) (
-      ifStudent = groupId => accessService.listStudentIdsByGroupId(groupId).map(Some(_)),
-      ifTeacher = Future.successful(None)
+      ifStudent = groupId => accessService.listStudentIdsByGroupId(groupId),
+      ifTeacher = ApiError(401, "teachers do not belong to any group")
     )
   }
 }

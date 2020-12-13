@@ -15,7 +15,7 @@ class CourseController(courseRepo: CourseRepository, accessService: AccessServic
       get { listCourses(userId) }
     } ~ pathPrefix(Segment) { courseId => concat (
       // todo
-      complete(s"extracted courseId = ${courseId}")
+      complete(s"extracted courseId = $courseId")
     )}
   }
 

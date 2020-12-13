@@ -17,21 +17,21 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
 
   def route: Route = concat(
     path("login") {
-      post { entity(as[LoginEntity]) { entity => onSuccess(login(entity)) {
-        case Some(session) => setCookie(HttpCookie(sessionCookieName, value = session)) { complete("success") }
-        case None => complete(401, "login failed")
-      }}}
+      post { entity(as[LoginEntity]) { entity =>
+        futureToResponse(
+          login(entity),
+          (session: String) => setCookie(HttpCookie(sessionCookieName, value = session)) {
+            successResponse
+          }
+        )
+      }}
     },
     path("register") {
-      post { entity(as[RegisterEntity]) { entity => onSuccess(register(entity)) {
-        if (_) complete("success") else complete(401, "invalid verification")
-      }}}
+      post { entity(as[RegisterEntity]) { entity => register(entity) } }
     },
     path("change-password") {
       userSession { userId =>
-        post { entity(as[ChangePasswordEntity]) { entity => onSuccess(changePassword(userId, entity)) {
-          if (_) complete("success") else complete(401, "invalid passwords specified")
-        }}}
+        post { entity(as[ChangePasswordEntity]) { entity => changePassword(userId, entity) } }
       }
     },
   )
@@ -48,42 +48,44 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
     authRepo.findUserIdBySession(session)
   }
 
-  private def login(entity: LoginEntity): Future[Option[String]] = {
+  private def login(entity: LoginEntity): Future[String] = {
     val passwordHash = hashPassword(entity.password)
     val userIdOptFuture = authRepo.findUserIdByAuthPair(entity.email, passwordHash)
     userIdOptFuture.flatMap {
-      case Some(userId) => authRepo.createSession(userId).map(Some(_))
-      case None => Future.successful(None)
+      case Some(userId) => authRepo.createSession(userId)
+      case None => ApiError(401, "login failed")
     }
   }
 
-  private def register(entity: RegisterEntity): Future[Boolean] = {
-    if (isPasswordStrongEnough(entity.password) && isEmailValid(entity.email)) {
+  private def register(entity: RegisterEntity): Future[Unit] = {
+    if (!isPasswordStrongEnough(entity.password)) {
+      ApiError(400, "password is too weak")
+    } else if (!isEmailValid(entity.email)) {
+      ApiError(400, "email is not valid")
+    } else {
       val passwordHash = hashPassword(entity.password)
       val userIdOptFuture = authRepo.findUserIdByVerification(entity.verificationCode)
       userIdOptFuture.flatMap {
         case Some(userId) =>
           authRepo.setAuthPair(userId, entity.email, passwordHash)
             .flatMap(_ => authRepo.destroyVerification(entity.verificationCode))
-            .map(_ => true)
-        case None => Future.successful(false)
+            .map(_ => ())
+        case None => ApiError(401, "verification code is invalid")
       }
-    } else {
-      Future.successful(false)
     }
   }
 
-  private def changePassword(userId: Id[User], entity: ChangePasswordEntity): Future[Boolean] = {
-    if (isPasswordStrongEnough(entity.newPassword)) {
+  private def changePassword(userId: Id[User], entity: ChangePasswordEntity): Future[Unit] = {
+    if (!isPasswordStrongEnough(entity.newPassword)) {
+      ApiError(400, "new password is too weak")
+    } else {
       val oldPasswordHash = hashPassword(entity.oldPassword)
       val newPasswordHash = hashPassword(entity.newPassword)
       authRepo.getPasswordHash(userId).flatMap {
-        case x if x == oldPasswordHash =>
-          authRepo.setPasswordHash(userId, newPasswordHash).map(_ => true)
-        case _ => Future.successful(false)
+        case dbPasswordHash if dbPasswordHash == oldPasswordHash =>
+          authRepo.setPasswordHash(userId, newPasswordHash).map(_ => ())
+        case _ => ApiError(401, "old passwords do not match")
       }
-    } else {
-      Future.successful(false)
     }
   }
 }

@@ -1,15 +1,34 @@
 package hw.ppposd.lms
 
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.server.{Directives, Route}
 import play.api.libs.json.{Json, Writes}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 trait Controller extends Directives {
-  implicit def jsonResponse[T : Writes](entity: Future[T])(implicit ec: ExecutionContext): Route =
-    onSuccess(entity.map(Json.toJson(_).toString())) {complete(_)}
+  case class ApiError(code: Int, message: String) extends Throwable
+  object ApiError {
+    def apply(code: Int, message: String): Future[Nothing] =
+      Future.failed(new ApiError(code, message))
+  }
 
-  implicit def emptyResponse(entity: Future[Unit])(implicit ec: ExecutionContext): Route =
-    onSuccess(entity) {complete("success")}
+  val successResponse: Route = complete("""{"success":"true"}""")
+  def errorResponse(error: ApiError): Route =
+    complete(error.code, s"""{"error":"${error.message}"}""")
+
+  def futureToResponse[T](result: Future[T], completer: T => Route): Route =
+    onComplete(result) {
+      case Success(writable) => completer(writable)
+      case Failure(error: ApiError) => errorResponse(error)
+      case Failure(error) =>
+        error.printStackTrace()
+        errorResponse(new ApiError(500, "internal server error"))
+    }
+
+  implicit def futureToResponse(result: Future[Unit]): Route =
+    futureToResponse[Unit](result, (_: Unit) => successResponse)
+
+  implicit def futureToResponse[T : Writes](result: Future[T]): Route =
+    futureToResponse(result, (writable: T) => complete(Json.toJson(writable).toString()))
 }
