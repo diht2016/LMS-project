@@ -1,4 +1,4 @@
-package hw.ppposd.lms.links
+package hw.ppposd.lms.access
 
 import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.group.Group

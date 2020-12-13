@@ -12,8 +12,10 @@ object Application extends App {
 
   Schema.createSchema()
 
-  val port = 8080
-  val binding = Http().newServerAt("localhost", port).bind(RootRouting.route)
+  val route = new RootRouting(new Wiring).route
+
+  val port = 8080 // todo: move to config
+  val binding = Http().newServerAt("localhost", port).bind(route)
 
   println(s"Server running at http://localhost:$port/")
   println("Press RETURN to stop")

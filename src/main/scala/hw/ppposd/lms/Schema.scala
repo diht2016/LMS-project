@@ -4,7 +4,7 @@ import hw.ppposd.lms.auth.{SessionTable, VerificationTable}
 import hw.ppposd.lms.course.CourseTable
 import hw.ppposd.lms.group.GroupTable
 import hw.ppposd.lms.course.homework.HomeworkTable
-import hw.ppposd.lms.links.{CourseTeacher, CourseTeacherTable, CourseTutorTable, GroupCourseTable}
+import hw.ppposd.lms.access.{CourseTeacher, CourseTeacherTable, CourseTutorTable, GroupCourseTable}
 import hw.ppposd.lms.course.material.MaterialTable
 import hw.ppposd.lms.course.homework.solution.SolutionTable
 import hw.ppposd.lms.user.UserTable

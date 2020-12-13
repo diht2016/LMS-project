@@ -34,11 +34,11 @@ object StudentData {
 }
 
 class StudentDataTable(tag: Tag) extends Table[StudentData](tag, "student_data") {
-  def userId = column[Id[User]]("user_id", O.PrimaryKey)
+  def studentId = column[Id[User]]("student_id", O.PrimaryKey)
   def yearOfEnrollment = column[Int]("year_of_enrollment")
   def degree = column[Degree]("degree")
   def studyForm =  column[StudyForm]("study_form")
   def learningBase = column[LearningBase]("learning_base")
 
-  def * = (userId, yearOfEnrollment, degree, studyForm, learningBase) <> ((StudentData.apply _).tupled, StudentData.unapply)
+  def * = (studentId, yearOfEnrollment, degree, studyForm, learningBase) <> ((StudentData.apply _).tupled, StudentData.unapply)
 }

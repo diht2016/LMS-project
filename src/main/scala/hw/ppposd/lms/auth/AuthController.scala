@@ -10,12 +10,12 @@ import play.api.libs.json.{Json, Reads}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthController(authRepo: AuthRepository) extends Controller {
+class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) extends Controller {
   private val sessionCookieName = "SESSION"
   import AuthController._
   import AuthUtils._
 
-  def route(implicit ec: ExecutionContext): Route = pathPrefix("auth") { concat (
+  def route: Route = concat(
     path("login") {
       post { entity(as[LoginEntity]) { entity => onSuccess(login(entity)) {
         case Some(session) => setCookie(HttpCookie(sessionCookieName, value = session)) { complete("success") }
@@ -34,9 +34,9 @@ class AuthController(authRepo: AuthRepository) extends Controller {
         }}}
       }
     },
-  )}
+  )
 
-  def userSession(innerRoute: Id[User] => Route)(implicit ec: ExecutionContext): Route =
+  def userSession(innerRoute: Id[User] => Route): Route =
     cookie(sessionCookieName) { session =>
       onSuccess(sessionToUserId(session.value)) {
         case Some(userId) => innerRoute(userId)
@@ -48,7 +48,7 @@ class AuthController(authRepo: AuthRepository) extends Controller {
     authRepo.findUserIdBySession(session)
   }
 
-  private def login(entity: LoginEntity)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  private def login(entity: LoginEntity): Future[Option[String]] = {
     val passwordHash = hashPassword(entity.password)
     val userIdOptFuture = authRepo.findUserIdByAuthPair(entity.email, passwordHash)
     userIdOptFuture.flatMap {
@@ -57,7 +57,7 @@ class AuthController(authRepo: AuthRepository) extends Controller {
     }
   }
 
-  private def register(entity: RegisterEntity)(implicit ec: ExecutionContext): Future[Boolean] = {
+  private def register(entity: RegisterEntity): Future[Boolean] = {
     if (isPasswordStrongEnough(entity.password) && isEmailValid(entity.email)) {
       val passwordHash = hashPassword(entity.password)
       val userIdOptFuture = authRepo.findUserIdByVerification(entity.verificationCode)
@@ -73,8 +73,7 @@ class AuthController(authRepo: AuthRepository) extends Controller {
     }
   }
 
-  private def changePassword(userId: Id[User], entity: ChangePasswordEntity)
-                            (implicit ec: ExecutionContext): Future[Boolean] = {
+  private def changePassword(userId: Id[User], entity: ChangePasswordEntity): Future[Boolean] = {
     if (isPasswordStrongEnough(entity.newPassword)) {
       val oldPasswordHash = hashPassword(entity.oldPassword)
       val newPasswordHash = hashPassword(entity.newPassword)
