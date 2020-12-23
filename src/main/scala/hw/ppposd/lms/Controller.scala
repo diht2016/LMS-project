@@ -13,7 +13,7 @@ trait Controller extends Directives {
       Future.failed(new ApiError(code, message))
   }
 
-  val successResponse: Route = complete("""{"success":"true"}""")
+  val successResponse: Route = complete("""{"success":true}""")
   def errorResponse(error: ApiError): Route =
     complete(error.code, s"""{"error":"${error.message}"}""")
 
@@ -31,4 +31,9 @@ trait Controller extends Directives {
 
   implicit def futureToResponse[T : Writes](result: Future[T]): Route =
     futureToResponse(result, (writable: T) => complete(Json.toJson(writable).toString()))
+
+  def assertSingleUpdate(updated: Int): Future[Unit] = updated match {
+    case 1 => Future.unit
+    case _ => ApiError(500, "failed to update data")
+  }
 }

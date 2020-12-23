@@ -17,9 +17,9 @@ trait AuthRepository {
   def findUserIdByVerification(code: String): Future[Option[Id[User]]]
   def destroyVerification(code: String): Future[Int]
 
-  def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit]
+  def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Int]
   def getPasswordHash(userId: Id[User]): Future[String]
-  def setPasswordHash(userId: Id[User], passwordHash: String): Future[Unit]
+  def setPasswordHash(userId: Id[User], passwordHash: String): Future[Int]
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -49,10 +49,14 @@ class AuthRepositoryImpl extends AuthRepository {
   override def destroyVerification(code: String): Future[Int] =
     db.run(verifications.filter(_.code === code).delete)
 
-  override def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Unit] = ???
+  override def setAuthPair(userId: Id[User], email: String, passwordHash: String): Future[Int] =
+    db.run(users.filter(_.id === userId).map(x => (x.email, x.passwordHash))
+      .update(email, passwordHash))
 
   override def getPasswordHash(userId: Id[User]): Future[String] =
     db.run(users.filter(_.id === userId).map(_.passwordHash).result.head)
 
-  override def setPasswordHash(userId: Id[User], passwordHash: String): Future[Unit] = ???
+  override def setPasswordHash(userId: Id[User], passwordHash: String): Future[Int] =
+    db.run(users.filter(_.id === userId).map(_.passwordHash)
+      .update(passwordHash))
 }

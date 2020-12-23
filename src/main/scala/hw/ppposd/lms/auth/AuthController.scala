@@ -1,6 +1,6 @@
 package hw.ppposd.lms.auth
 
-import akka.http.scaladsl.model.headers.HttpCookie
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Route
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
@@ -11,7 +11,7 @@ import play.api.libs.json.{Json, Reads}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) extends Controller {
-  private val sessionCookieName = "SESSION"
+  private val sessionHeaderName = "Session"
   import AuthController._
   import AuthUtils._
 
@@ -20,7 +20,7 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
       post { entity(as[LoginEntity]) { entity =>
         futureToResponse(
           login(entity),
-          (session: String) => setCookie(HttpCookie(sessionCookieName, value = session)) {
+          (session: String) => respondWithHeaders(RawHeader(sessionHeaderName, session)) {
             successResponse
           }
         )
@@ -37,16 +37,12 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
   )
 
   def userSession(innerRoute: Id[User] => Route): Route =
-    cookie(sessionCookieName) { session =>
-      onSuccess(sessionToUserId(session.value)) {
+    headerValueByName(sessionHeaderName) { session =>
+      onSuccess(authRepo.findUserIdBySession(session)) {
         case Some(userId) => innerRoute(userId)
         case None => complete(401, "invalid session")
       }
     }
-
-  private def sessionToUserId(session: String): Future[Option[Id[User]]] = {
-    authRepo.findUserIdBySession(session)
-  }
 
   private def login(entity: LoginEntity): Future[String] = {
     val passwordHash = hashPassword(entity.password)
@@ -68,8 +64,9 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
       userIdOptFuture.flatMap {
         case Some(userId) =>
           authRepo.setAuthPair(userId, entity.email, passwordHash)
+            .flatMap(assertSingleUpdate)
             .flatMap(_ => authRepo.destroyVerification(entity.verificationCode))
-            .map(_ => ())
+            .flatMap(assertSingleUpdate)
         case None => ApiError(401, "verification code is invalid")
       }
     }
@@ -83,7 +80,8 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
       val newPasswordHash = hashPassword(entity.newPassword)
       authRepo.getPasswordHash(userId).flatMap {
         case dbPasswordHash if dbPasswordHash == oldPasswordHash =>
-          authRepo.setPasswordHash(userId, newPasswordHash).map(_ => ())
+          authRepo.setPasswordHash(userId, newPasswordHash)
+            .flatMap(assertSingleUpdate)
         case _ => ApiError(401, "old passwords do not match")
       }
     }
