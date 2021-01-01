@@ -37,7 +37,7 @@
   - change password using old password (password should be hard)
     - `PUT /auth/change-password (oldPassword, newPassword)`
   - edit own PersonalData (phone and links are validated)
-    - `PATCH /users/me (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
+    - `PATCH /users/me/personal (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
   - view other User data and PersonalData (except learningBase)
     - `GET /users/{user.id}`
 * Student

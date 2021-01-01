@@ -18,11 +18,11 @@ class CourseControllerSpec extends SpecBase {
 
   "getCourses" should "return list of courses" in new TestWiring {
     accessRepoMock.getUserGroupId _ expects sampleUserId returns
-      Future.successful(Some(sampleGroupId)) once()
+      Future.successful(Some(sampleGroupId)) repeat 1
     accessRepoMock.listGroupCourseIds _ expects sampleGroupId returns
-      Future.successful(Seq(sampleCourseId)) once()
+      Future.successful(Seq(sampleCourseId)) repeat 1
     courseRepoMock.find _ expects sampleCourseId returns
-      Future.successful(Some(sampleCourse)) once()
+      Future.successful(Some(sampleCourse)) repeat 1
 
     private val route = controller.route(sampleUserId)
 

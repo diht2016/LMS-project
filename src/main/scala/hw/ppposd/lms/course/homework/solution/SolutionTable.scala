@@ -15,5 +15,5 @@ class SolutionTable(tag: Tag) extends Table[Solution](tag, "solutions") {
   def test = column[String]("text")
   def date = column[Timestamp]("date")
 
-  def * = (homeworkId, studentId, test, date) <> (Solution.tupled, Solution.unapply)
+  def * = (homeworkId, studentId, test, date) .<> (Solution.tupled, Solution.unapply)
 }

@@ -40,5 +40,5 @@ class StudentDataTable(tag: Tag) extends Table[StudentData](tag, "student_data")
   def studyForm =  column[StudyForm]("study_form")
   def learningBase = column[LearningBase]("learning_base")
 
-  def * = (studentId, yearOfEnrollment, degree, studyForm, learningBase) <> ((StudentData.apply _).tupled, StudentData.unapply)
+  def * = (studentId, yearOfEnrollment, degree, studyForm, learningBase) .<> ((StudentData.apply _).tupled, StudentData.unapply)
 }

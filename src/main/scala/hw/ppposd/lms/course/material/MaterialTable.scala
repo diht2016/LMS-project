@@ -16,5 +16,5 @@ class MaterialTable(tag: Tag) extends Table[Material](tag, "materials") {
   def description = column[String]("description")
   def creationDate = column[Timestamp]("creation_date")
 
-  def * = (materialId, courseId, name, description, creationDate) <> (Material.tupled, Material.unapply)
+  def * = (materialId, courseId, name, description, creationDate) .<> (Material.tupled, Material.unapply)
 }

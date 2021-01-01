@@ -11,8 +11,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class GroupController(accessService: AccessService)
                      (implicit ec: ExecutionContext) extends Controller {
   def route(userId: Id[User]): Route = {
-    pathEndOrSingleSlash {
-      get { listGroupStudents(userId) }
+    (pathEndOrSingleSlash & get) {
+      listGroupStudents(userId)
     }
   }
 

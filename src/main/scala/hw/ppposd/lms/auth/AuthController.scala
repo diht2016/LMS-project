@@ -16,22 +16,20 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
   import AuthUtils._
 
   def route: Route = concat(
-    path("login") {
-      post { entity(as[LoginEntity]) { entity =>
-        futureToResponse(
-          login(entity),
-          (session: String) => respondWithHeaders(RawHeader(sessionHeaderName, session)) {
-            successResponse
-          }
-        )
-      }}
+    (path("login") & post & entity(as[LoginEntity])) { entity =>
+      futureToResponse(
+        login(entity),
+        (session: String) => respondWithHeaders(RawHeader(sessionHeaderName, session)) {
+          successResponse
+        }
+      )
     },
-    path("register") {
-      post { entity(as[RegisterEntity]) { entity => register(entity) } }
+    (path("register") & post & entity(as[RegisterEntity])) { entity =>
+      register(entity)
     },
-    path("change-password") {
+    (path("change-password") & post & entity(as[ChangePasswordEntity])) { entity =>
       userSession { userId =>
-        post { entity(as[ChangePasswordEntity]) { entity => changePassword(userId, entity) } }
+        changePassword(userId, entity)
       }
     },
   )
@@ -98,4 +96,3 @@ object AuthController extends PlayJsonSupport {
   final case class ChangePasswordEntity(oldPassword: String, newPassword: String)
   implicit val changePasswordFormat: Reads[ChangePasswordEntity] = Json.reads[ChangePasswordEntity]
 }
-

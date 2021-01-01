@@ -17,5 +17,5 @@ class UserTable(tag: Tag) extends Table[User](tag, "user") {
   def passwordHash = column[String]("password_hash")
   def groupId = column[Option[Id[Group]]]("group_id")
 
-  def * = (id, fullName, email, passwordHash, groupId) <> (User.tupled, User.unapply)
+  def * = (id, fullName, email, passwordHash, groupId) .<> (User.tupled, User.unapply)
 }
