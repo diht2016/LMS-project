@@ -11,5 +11,5 @@ class CourseTutorTable(tag: Tag) extends Table[CourseTutor](tag, "course_tutor_l
   def courseId = column[Id[Course]]("course_id", O.PrimaryKey)
   def studentId = column[Id[User]]("student_id", O.PrimaryKey)
 
-  def * = (courseId, studentId) <> (CourseTutor.tupled, CourseTutor.unapply)
+  def * = (courseId, studentId) .<> (CourseTutor.tupled, CourseTutor.unapply)
 }

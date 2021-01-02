@@ -36,4 +36,14 @@ trait Controller extends Directives {
     case 1 => Future.unit
     case _ => ApiError(500, "failed to update data")
   }
+
+  def lookupIfSome[A, B](opt: Option[A], f: A => Future[Option[B]]): Future[Option[B]] = opt match {
+    case Some(a) => f(a)
+    case None => Future.successful(None)
+  }
+
+  def lookupIfNeeded[A, B](opt: Option[A], f: => Future[Option[B]]): Future[Option[B]] = opt match {
+    case Some(_) => f
+    case None => Future.successful(None)
+  }
 }

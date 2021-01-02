@@ -10,5 +10,5 @@ class SessionTable(tag: Tag) extends Table[Session](tag, "sessions") {
   def session = column[String]("session", O.PrimaryKey)
   def userId = column[Id[User]]("userId")
 
-  def * = (session, userId) <> (Session.tupled, Session.unapply)
+  def * = (session, userId) .<> (Session.tupled, Session.unapply)
 }

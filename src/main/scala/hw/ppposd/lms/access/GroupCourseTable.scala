@@ -11,5 +11,5 @@ class GroupCourseTable(tag: Tag) extends Table[GroupCourse](tag, "group_course_l
   def groupId = column[Id[Group]]("group_id", O.PrimaryKey)
   def courseId = column[Id[Course]]("course_id", O.PrimaryKey)
 
-  def * = (groupId, courseId) <> ((GroupCourse.apply _).tupled, GroupCourse.unapply)
+  def * = (groupId, courseId) .<> ((GroupCourse.apply _).tupled, GroupCourse.unapply)
 }

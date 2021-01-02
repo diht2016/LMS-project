@@ -11,8 +11,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class CourseController(courseRepo: CourseRepository, accessService: AccessService)
                       (implicit ec: ExecutionContext) extends Controller {
   def route(userId: Id[User]): Route = {
-    pathEndOrSingleSlash {
-      get { listCourses(userId) }
+    (pathEndOrSingleSlash & get) {
+      listCourses(userId)
     } ~ pathPrefix(Segment) { courseId => concat (
       // todo
       complete(s"extracted courseId = $courseId")

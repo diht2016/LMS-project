@@ -21,6 +21,6 @@ class Wiring(implicit ec: ExecutionContext) {
     val authController = new AuthController(authRepo)
     val courseController = new CourseController(courseRepo, accessService)
     val groupController = new GroupController(accessService)
-    val userController = new UserController(userRepo)
+    val userController = new UserController(userRepo, groupRepo)
   }
 }

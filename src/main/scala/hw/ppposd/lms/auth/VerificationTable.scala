@@ -10,5 +10,5 @@ class VerificationTable(tag: Tag) extends Table[Verification](tag, "verification
   def code = column[String]("code", O.PrimaryKey)
   def userId = column[Id[User]]("userId")
 
-  def * = (code, userId) <> (Verification.tupled, Verification.unapply)
+  def * = (code, userId) .<> (Verification.tupled, Verification.unapply)
 }
