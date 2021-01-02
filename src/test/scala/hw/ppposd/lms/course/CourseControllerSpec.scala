@@ -8,7 +8,17 @@ import hw.ppposd.lms.util.Id
 
 import scala.concurrent.Future
 
+
+
 class CourseControllerSpec extends SpecBase {
+
+  private trait TestWiring {
+    protected val accessRepoMock = mock[AccessRepository]
+    protected val courseRepoMock = mock[CourseRepository]
+    protected val accessService = new AccessService(accessRepoMock)
+    protected val controller = new CourseController(courseRepoMock, accessService)
+  }
+
   private val sampleUserId = new Id[User](234)
   private val sampleGroupId = new Id[Group](26)
   private val sampleCourseId = new Id[Course](11)
@@ -31,10 +41,5 @@ class CourseControllerSpec extends SpecBase {
     }
   }
 
-  private trait TestWiring {
-    protected val accessRepoMock = mock[AccessRepository]
-    protected val courseRepoMock = mock[CourseRepository]
-    protected val accessService = new AccessService(accessRepoMock)
-    protected val controller = new CourseController(courseRepoMock, accessService)
-  }
+
 }
