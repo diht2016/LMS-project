@@ -1,12 +1,36 @@
 package hw.ppposd.lms
 
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.server.{Directive1, Directives, Route}
+import hw.ppposd.lms.util.Id
 import play.api.libs.json.{Json, Writes}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait Controller extends Directives {
+  /**
+   * Directive which extracts [[Id]] of given type `A` from request path.
+   *
+   * Example:
+   * {{{
+   *   pathPrefixId[User] { userId =>
+   *     // do something with userId here
+   *   }
+   * }}}
+   */
+  def pathPrefixId[A]: Directive1[Id[A]] = pathPrefix(LongNumber).map(new Id[A](_))
+
+  /**
+   * Provides a HTTP REST API error with code and error message.
+   *
+   * Example:
+   * {{{
+   *   userIdOptFuture.flatMap {
+   *     case Some(userId) => ??? // do some work and return some successful future here
+   *     case None => ApiError(404, "user not found")
+   *   }
+   * }}}
+   */
   case class ApiError(code: Int, message: String) extends Throwable
   object ApiError {
     def apply(code: Int, message: String): Future[Nothing] =
@@ -32,6 +56,16 @@ trait Controller extends Directives {
   implicit def futureToResponse[T : Writes](result: Future[T]): Route =
     futureToResponse(result, (writable: T) => complete(Json.toJson(writable).toString()))
 
+  /**
+   * Asserts that exactly one row changed after repository method call
+   * and replaces this number with a Unit value.
+   *
+   * Example:
+   * {{{
+   *   someRepo.updateSomething(something)
+   *     .flatMap(assertSingleUpdate)
+   * }}}
+   */
   def assertSingleUpdate(updated: Int): Future[Unit] = updated match {
     case 1 => Future.unit
     case _ => ApiError(500, "failed to update data")
