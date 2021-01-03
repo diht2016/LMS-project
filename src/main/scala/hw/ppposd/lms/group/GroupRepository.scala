@@ -11,7 +11,7 @@ trait GroupRepository {
   def list(): Future[Seq[Group]]
 }
 
-class GroupRepositoryImpl extends GroupRepository {
+class GroupRepositoryImpl(implicit db: Database) extends GroupRepository {
   import hw.ppposd.lms.Schema._
 
   override def create(name: String, department: String, courseNumber: Int): Future[Id[Group]] =

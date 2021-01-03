@@ -2,20 +2,16 @@ package hw.ppposd.lms.course
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import hw.ppposd.lms.SpecBase
 import hw.ppposd.lms.access.{AccessRepository, AccessService, CourseBrief}
+import hw.ppposd.lms.base.RouteSpecBase
 import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 
 import scala.concurrent.Future
 
-class CourseControllerSpec extends SpecBase {
-  private val sampleUserId = new Id[User](234)
-  private val sampleGroupId = new Id[Group](26)
-  private val sampleCourseId = new Id[Course](11)
-  private val sampleCourse = Course(sampleCourseId, "test course", "sample desc")
-  private val sampleCourseBrief = CourseBrief(sampleCourseId, "test course")
+class CourseControllerSpec extends RouteSpecBase {
+  import CourseControllerSpec._
 
   "CourseController" should "return list of courses" in new TestWiring {
     accessRepoMock.getUserGroupId _ expects sampleUserId returns
@@ -67,4 +63,12 @@ class CourseControllerSpec extends SpecBase {
     protected val controller = new CourseController(courseRepoMock, accessService)
     protected val route: Route = controller.route(sampleUserId)
   }
+}
+
+object CourseControllerSpec {
+  private val sampleUserId = new Id[User](234)
+  private val sampleGroupId = new Id[Group](26)
+  private val sampleCourseId = new Id[Course](11)
+  private val sampleCourse = Course(sampleCourseId, "test course", "sample desc")
+  private val sampleCourseBrief = CourseBrief(sampleCourseId, "test course")
 }

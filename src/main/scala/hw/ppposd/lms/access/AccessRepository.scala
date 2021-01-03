@@ -22,7 +22,7 @@ trait AccessRepository {
   def enrichCourses(courseIds: Seq[Id[Course]]): Future[Seq[CourseBrief]]
 }
 
-class AccessRepositoryImpl(implicit ec: ExecutionContext) extends AccessRepository {
+class AccessRepositoryImpl(implicit db: Database, ec: ExecutionContext) extends AccessRepository {
   import hw.ppposd.lms.Schema._
 
   override def getUserGroupId(userId: Id[User]): Future[Option[Id[Group]]] =

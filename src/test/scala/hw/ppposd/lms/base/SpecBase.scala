@@ -1,7 +1,7 @@
-package hw.ppposd.lms
+package hw.ppposd.lms.base
 
-import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,4 +9,4 @@ trait SpecBase
   extends AnyFlatSpec
   with Matchers
   with MockFactory
-  with ScalatestRouteTest
+  with ScalaFutures

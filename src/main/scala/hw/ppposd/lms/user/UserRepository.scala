@@ -21,7 +21,7 @@ trait UserRepository {
   def setPersonalData(data: PersonalData): Future[Int]
 }
 
-class UserRepositoryImpl extends UserRepository {
+class UserRepositoryImpl(implicit db: Database) extends UserRepository {
   import hw.ppposd.lms.Schema._
 
   override def create(name: String, fullName: String, groupId: Option[Id[Group]]): Future[Id[User]] =

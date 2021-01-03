@@ -5,11 +5,11 @@ import hw.ppposd.lms.auth.{AuthController, AuthRepositoryImpl}
 import hw.ppposd.lms.course.{CourseController, CourseRepositoryImpl}
 import hw.ppposd.lms.group.{GroupController, GroupRepositoryImpl}
 import hw.ppposd.lms.user.{UserController, UserRepositoryImpl}
-import hw.ppposd.lms.Schema.db
+import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.ExecutionContext
 
-class Wiring(implicit ec: ExecutionContext) {
+class Wiring(implicit db: Database, ec: ExecutionContext) {
   val accessRepo = new AccessRepositoryImpl
   val authRepo = new AuthRepositoryImpl
   val courseRepo = new CourseRepositoryImpl
