@@ -2,7 +2,7 @@ package hw.ppposd.lms.group
 
 import akka.http.scaladsl.server.Route
 import hw.ppposd.lms.Controller
-import hw.ppposd.lms.access.AccessService
+import hw.ppposd.lms.access.{AccessService, UserBrief}
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 
@@ -16,9 +16,9 @@ class GroupController(accessService: AccessService)
     }
   }
 
-  def listGroupStudents(userId: Id[User]): Future[Seq[Id[User]]] = {
+  def listGroupStudents(userId: Id[User]): Future[Seq[UserBrief]] = {
     accessService.matchUserType(userId) (
-      ifStudent = groupId => accessService.listStudentIdsByGroupId(groupId),
+      ifStudent = groupId => accessService.listGroupStudentBriefs(groupId),
       ifTeacher = ApiError(401, "teachers do not belong to any group")
     )
   }

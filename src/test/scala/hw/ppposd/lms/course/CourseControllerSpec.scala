@@ -1,7 +1,9 @@
 package hw.ppposd.lms.course
 
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
 import hw.ppposd.lms.SpecBase
-import hw.ppposd.lms.access.{AccessRepository, AccessService}
+import hw.ppposd.lms.access.{AccessRepository, AccessService, CourseBrief}
 import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
@@ -12,21 +14,48 @@ class CourseControllerSpec extends SpecBase {
   private val sampleUserId = new Id[User](234)
   private val sampleGroupId = new Id[Group](26)
   private val sampleCourseId = new Id[Course](11)
-  private val sampleCourse = Course(sampleCourseId, "test", "desc")
-  private val sampleResponse =
-    s"""[{"id":${sampleCourseId.value},"name":"test","description":"desc"}]"""
+  private val sampleCourse = Course(sampleCourseId, "test course", "sample desc")
+  private val sampleCourseBrief = CourseBrief(sampleCourseId, "test course")
 
-  "getCourses" should "return list of courses" in new TestWiring {
+  "CourseController" should "return list of courses" in new TestWiring {
     accessRepoMock.getUserGroupId _ expects sampleUserId returns
-      Future.successful(Some(sampleGroupId)) repeat 1
+      Future.successful(Some(sampleGroupId))
     accessRepoMock.listGroupCourseIds _ expects sampleGroupId returns
-      Future.successful(Seq(sampleCourseId)) repeat 1
-    courseRepoMock.find _ expects sampleCourseId returns
-      Future.successful(Some(sampleCourse)) repeat 1
+      Future.successful(Seq(sampleCourseId))
+    accessRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
+      Future.successful(Seq(sampleCourseBrief))
 
-    private val route = controller.route(sampleUserId)
+    private val sampleResponse =
+      s"""[{"id":${sampleCourseId.value},"name":"test course"}]"""
 
     Get() ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (sampleResponse)
+    }
+  }
+
+  it should "return course by id" in new TestWiring {
+    courseRepoMock.find _ expects sampleCourseId returns
+      Future.successful(Some(sampleCourse))
+
+    private val sampleResponse =
+      s"""{"id":${sampleCourseId.value},"name":"test course","description":"sample desc"}"""
+
+    Get(s"/${sampleCourseId.value}") ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (sampleResponse)
+    }
+  }
+
+  it should "respond with 404 if no course found" in new TestWiring {
+    courseRepoMock.find _ expects sampleCourseId returns
+      Future.successful(None)
+
+    private val sampleResponse =
+      s"""{"error":"course not found"}"""
+
+    Get(s"/${sampleCourseId.value}") ~> route ~> check {
+      status should be (StatusCodes.NotFound)
       responseAs[String] should be (sampleResponse)
     }
   }
@@ -36,5 +65,6 @@ class CourseControllerSpec extends SpecBase {
     protected val courseRepoMock = mock[CourseRepository]
     protected val accessService = new AccessService(accessRepoMock)
     protected val controller = new CourseController(courseRepoMock, accessService)
+    protected val route: Route = controller.route(sampleUserId)
   }
 }

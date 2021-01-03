@@ -17,19 +17,32 @@ class AccessService(accessRepo: AccessRepository)(implicit ec: ExecutionContext)
     }
   }
 
-  def getUserCourseIds(userId: Id[User]): Future[Seq[Id[Course]]] = {
-    matchUserType(userId) (
-      ifStudent = groupId => accessRepo.listGroupCourseIds(groupId),
-      ifTeacher = accessRepo.listTeacherCourseIds(userId)
-    )
+  def canManageTutors(userId: Id[User], courseId: Id[Course]): Future[Boolean] = {
+    accessRepo.isCourseTeacher(userId, courseId)
   }
 
-  def hasMaterialAccess(userId: Id[User], courseId: Id[Course]): Future[Boolean] = {
+  def canManageMaterials(userId: Id[User], courseId: Id[Course]): Future[Boolean] = {
     val isTeacher = accessRepo.isCourseTeacher(userId, courseId)
     val isTutor = accessRepo.isCourseTeacher(userId, courseId)
     Future.find(List(isTeacher, isTutor)) { _ == true } map { _.isDefined }
   }
 
-  def listStudentIdsByGroupId(groupId: Id[Group]): Future[Seq[Id[User]]] =
-    accessRepo.listStudentIdsByGroupId(groupId)
+  def listUserCourseBriefs(userId: Id[User]): Future[Seq[CourseBrief]] = {
+    matchUserType(userId) (
+      ifStudent = groupId => accessRepo.listGroupCourseIds(groupId),
+      ifTeacher = accessRepo.listTeacherCourseIds(userId)
+    ).flatMap(accessRepo.enrichCourses)
+  }
+
+  def listGroupStudentBriefs(groupId: Id[Group]): Future[Seq[UserBrief]] =
+    accessRepo.listGroupStudentIds(groupId)
+      .flatMap(accessRepo.enrichUsers)
+
+  def listCourseTeacherBriefs(courseId: Id[Course]): Future[Seq[UserBrief]] =
+    accessRepo.listCourseTeacherIds(courseId)
+      .flatMap(accessRepo.enrichUsers)
+
+  def listCourseTutorBriefs(courseId: Id[Course]): Future[Seq[UserBrief]] =
+    accessRepo.listCourseTutorIds(courseId)
+      .flatMap(accessRepo.enrichUsers)
 }

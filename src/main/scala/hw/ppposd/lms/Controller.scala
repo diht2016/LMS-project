@@ -66,9 +66,26 @@ trait Controller extends Directives {
    *     .flatMap(assertSingleUpdate)
    * }}}
    */
-  def assertSingleUpdate(updated: Int): Future[Unit] = updated match {
+  def assertSingleUpdate: Int => Future[Unit] = {
     case 1 => Future.unit
+    case 0 => ApiError(404, "nothing to update")
     case _ => ApiError(500, "failed to update data")
+  }
+
+  /**
+   * Asserts that the record is found, extracts the value
+   * otherwise provides a 404 error
+   *
+   * Example:
+   * {{{
+   *   someRepo.findSomething(someQuery)
+   *     .flatMap(assertFound("something"))
+   *     .flatMap(workWithSomethingHere)
+   * }}}
+   */
+  def assertFound[T](name: String): Option[T] => Future[T] = {
+    case Some(t) => Future.successful(t)
+    case None => ApiError(404, s"$name not found")
   }
 
   def lookupIfSome[A, B](opt: Option[A], f: A => Future[Option[B]]): Future[Option[B]] = opt match {
