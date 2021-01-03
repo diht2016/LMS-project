@@ -17,7 +17,7 @@ import slick.jdbc.H2Profile.api._
 import scala.concurrent.Future
 
 object Schema {
-  lazy val db = Database.forConfig("db")
+  implicit lazy val db = Database.forConfig("db")
 
   /**
    * Here are the tables

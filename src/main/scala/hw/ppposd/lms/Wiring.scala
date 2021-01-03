@@ -5,6 +5,7 @@ import hw.ppposd.lms.auth.{AuthController, AuthRepositoryImpl}
 import hw.ppposd.lms.course.{CourseController, CourseRepositoryImpl}
 import hw.ppposd.lms.group.{GroupController, GroupRepositoryImpl}
 import hw.ppposd.lms.user.{UserController, UserRepositoryImpl}
+import hw.ppposd.lms.Schema._
 
 import scala.concurrent.ExecutionContext
 

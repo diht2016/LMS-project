@@ -10,3 +10,4 @@ trait SpecBase
   with Matchers
   with MockFactory
   with ScalatestRouteTest
+

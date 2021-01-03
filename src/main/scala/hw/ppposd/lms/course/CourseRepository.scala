@@ -4,6 +4,7 @@ import hw.ppposd.lms.util.Id
 import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.Future
+import hw.ppposd.lms.Schema._
 
 trait CourseRepository {
   def create(name: String, description: String): Future[Id[Course]]
@@ -11,16 +12,15 @@ trait CourseRepository {
   def list(): Future[Seq[Course]]
 }
 
-class CourseRepositoryImpl extends CourseRepository {
-  import hw.ppposd.lms.Schema._
+class CourseRepositoryImpl(implicit database: Database) extends CourseRepository {
 
   override def create(name: String, description: String): Future[Id[Course]] =
-    db.run((courses returning courses.map(_.id))
+    database.run((courses returning courses.map(_.id))
       += Course(Id.auto, name, description))
 
   override def find(id: Id[Course]): Future[Option[Course]] =
-    db.run(courses.filter(_.id === id).result.headOption)
+    database.run(courses.filter(_.id === id).result.headOption)
 
   override def list(): Future[Seq[Course]] =
-    db.run(courses.result)
+    database.run(courses.result)
 }
