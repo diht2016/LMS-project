@@ -19,8 +19,7 @@ class UserController(userRepo: UserRepository, groupRepo: GroupRepository)
       } ~ (path("personal") & patch & entity(as[PersonalDataEntity])) { entity =>
         setPersonalData(userId, entity)
       }
-    } ~ (pathPrefix(LongNumber) & get) { segmentLong =>
-      val otherUserId = new Id[User](segmentLong)
+    } ~ (pathPrefixId[User] & get) { otherUserId =>
       getUserData(otherUserId, isSelf = false)
     }
   }
