@@ -50,11 +50,13 @@ trait SampleDatabaseContent {
   lazy val homeworkAlgebra: Homework = Homework(
     Id.auto,
     Id.auto,
+    Id.auto,
     "Matrices",
     "Ex 1-10",
     Timestamp.valueOf("2021-1-1 10:00:00"),
     Timestamp.valueOf("2021-1-7 00:00:00"))
   lazy val homeworkPhilosophy: Homework = Homework(
+    Id.auto,
     Id.auto,
     Id.auto,
     "R.Dekart",
@@ -95,8 +97,8 @@ object SampleDatabaseContent extends SampleDatabaseContent {
     insertRows(personalDataFull, personalData)
 
     val homeworksAlmostFull = Seq(
-      homeworkAlgebra.copy(courseId = coursesFull(0).id),
-      homeworkPhilosophy.copy(courseId = coursesFull(1).id)
+      homeworkAlgebra.copy(courseId = coursesFull(0).id, studentId = usersFull(0).id),
+      homeworkPhilosophy.copy(courseId = coursesFull(1).id, studentId = usersFull(1).id)
     )
     val homeworksFull = insertHomeworks(homeworksAlmostFull, homeworks)
 
@@ -130,7 +132,6 @@ object SampleDatabaseContent extends SampleDatabaseContent {
     )
     insertRows(groupCourseMap, groupCourseLinks)
 
-    //MUTATIONS!
     TestData(
       usersFull,
       coursesFull,
