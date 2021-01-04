@@ -9,9 +9,9 @@ class CourseRepositorySpec extends DatabaseSpecBase {
   "create" should "create new course" in new TestWiring {
     private val newCourse = Course(Id.auto, "temp course", "...")
 
-    whenReady(repo.create(newCourse.name, newCourse.description), oneSecond) { newId =>
+    whenReady(repo.create(newCourse.name, newCourse.description)) { newId =>
       val newCourseWithId = newCourse.copy(id = newId)
-      whenReady(repo.find(newId), oneSecond) {
+      whenReady(repo.find(newId)) {
         _ should be (Some(newCourseWithId))
       }
     }
@@ -24,8 +24,9 @@ class CourseRepositorySpec extends DatabaseSpecBase {
   }
 
   "find" should "return existing course" in new TestWiring {
-    whenReady(repo.find(testData.courses(0).id)) {
-      _ should be (Some(testData.courses(0)))
+    val course = testData.courses.last
+    whenReady(repo.find(course.id)) {
+      _ should be (Some(course))
     }
   }
 

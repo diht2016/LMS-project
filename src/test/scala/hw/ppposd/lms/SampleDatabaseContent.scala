@@ -21,42 +21,35 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 trait SampleDatabaseContent {
-  /**
-   * Public test data, can be used in database tests
-   */
+  val algebraCourse: Course = Course(Id.auto, "Linear algebra", "Some description")
+  val philosophyCourse: Course = Course(Id.auto, "Philosophy", "Some description")
+  val coursesData = Seq(algebraCourse, philosophyCourse)
 
-  lazy val algebraCourse: Course = Course(Id.auto, "Linear algebra", "Some description")
-  lazy val philosophyCourse: Course = Course(Id.auto, "Philosophy", "Some description")
-  lazy val coursesData = Seq(algebraCourse, philosophyCourse)
+  val student1: User = User(Id.auto, "Ivan Kozlov", "i.kozlov@lms.ru", "", None)
+  val student2: User = User(Id.auto, "Daria Titova", "d.titova@lms.ru", "", None)
+  val teacher1: User = User(Id.auto, "Alexey Soloviov", "a.soloviov@lms.ru", "", None)
+  val teacher2: User = User(Id.auto, "Maria Gorbunova", "m.gorbunova@lms.ru", "", None)
 
-  lazy val student1: User = User(Id.auto, "Ivan Kozlov", "i.kozlov@lms.ru", "", None)
-  lazy val student2: User = User(Id.auto, "Daria Titova", "d.titova@lms.ru", "", None)
-  lazy val teacher1: User = User(Id.auto, "Alexey Soloviov", "a.soloviov@lms.ru", "", None)
-  lazy val teacher2: User = User(Id.auto, "Maria Gorbunova", "m.gorbunova@lms.ru", "", None)
-  lazy val usersData = Seq(student1, student2, teacher1, teacher2)
+  val personalDataSt1: PersonalData = PersonalData(Id.auto, Some("89999999999"), Some("Voronezh"), None, Some("http://vk.com/ikozlov"), None, None, None)
+  val personalDataSt2: PersonalData = PersonalData(Id.auto, Some("87777777777"), Some("Tomsk"), None, None, None, None, Some("link"))
+  val personalDataT1: PersonalData = PersonalData(Id.auto, Some("86666666666"), Some("Kazan"), Some("Professor. Algebra course."), None, None, None, None)
+  val personalDataT2: PersonalData = PersonalData(Id.auto, Some("85555555555"), Some("Yakutsk"), Some("Professor. Philosophy course."), None, None, None, None)
 
-  lazy val personalDataSt1: PersonalData = PersonalData(Id.auto, Some("89999999999"), Some("Voronezh"), None, Some("http://vk.com/ikozlov"), None, None, None)
-  lazy val personalDataSt2: PersonalData = PersonalData(Id.auto, Some("87777777777"), Some("Tomsk"), None, None, None, None, Some("link"))
-  lazy val personalDataT1: PersonalData = PersonalData(Id.auto, Some("86666666666"), Some("Kazan"), Some("Professor. Algebra course."), None, None, None, None)
-  lazy val personalDataT2: PersonalData = PersonalData(Id.auto, Some("85555555555"), Some("Yakutsk"), Some("Professor. Philosophy course."), None, None, None, None)
+  val group1: Group = Group(Id.auto, "001", "Art and Science", 3)
+  val group2: Group = Group(Id.auto, "002", "Biology", 2)
+  val groupsData = Seq(group1, group2)
 
-  lazy val group1: Group = Group(Id.auto, "001", "Art and Science", 3)
-  lazy val group2: Group = Group(Id.auto, "002", "Biology", 2)
-  lazy val groupsData = Seq(group1, group2)
+  val studentData1: StudentData = StudentData(Id.auto, 2018, Degree.Bachelor, StudyForm.Intramural, LearningBase.Budget)
+  val studentData2: StudentData = StudentData(Id.auto, 2015, Degree.Master, StudyForm.Evening, LearningBase.Contract)
 
-  lazy val studentData1: StudentData = StudentData(Id.auto, Id.auto, 2018, Degree.Bachelor, StudyForm.Intramural, LearningBase.Budget)
-  lazy val studentData2: StudentData = StudentData(Id.auto, Id.auto, 2015, Degree.Master, StudyForm.Evening, LearningBase.Contract)
-
-  lazy val homeworkAlgebra: Homework = Homework(
-    Id.auto,
+  val homeworkAlgebra: Homework = Homework(
     Id.auto,
     Id.auto,
     "Matrices",
     "Ex 1-10",
     Timestamp.valueOf("2021-1-1 10:00:00"),
     Timestamp.valueOf("2021-1-7 00:00:00"))
-  lazy val homeworkPhilosophy: Homework = Homework(
-    Id.auto,
+  val homeworkPhilosophy: Homework = Homework(
     Id.auto,
     Id.auto,
     "R.Dekart",
@@ -64,14 +57,14 @@ trait SampleDatabaseContent {
     Timestamp.valueOf("2020-12-1 10:00:00"),
     Timestamp.valueOf("2020-12-14 00:00:00"))
 
-  lazy val solutionAlgebraSt1: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2021-1-3 12:30:00"))
-  lazy val solutionPhilosophySt2: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
+  val solutionAlgebraSt1: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2021-1-3 12:30:00"))
+  val solutionPhilosophySt2: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
 
-  lazy val materialAlgebra1: Material = Material(Id.auto, Id.auto, "Matrices", "Some description", Timestamp.valueOf("2020-12-25 12:30:00"))
-  lazy val materialAlgebra2: Material = Material(Id.auto, Id.auto, "Groups", "Some description", Timestamp.valueOf("2020-12-28 12:30:00"))
-  lazy val materialPhilosophy1: Material = Material(Id.auto, Id.auto, "R.Dekart", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
-  lazy val materialPhilosophy2: Material = Material(Id.auto, Id.auto, "Spinosa", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
-  lazy val materialPhilosophy3: Material = Material(Id.auto, Id.auto, "I.Kant", "Some description", Timestamp.valueOf("2020-12-14 10:00:00"))
+  val materialAlgebra1: Material = Material(Id.auto, Id.auto, "Matrices", "Some description", Timestamp.valueOf("2020-12-25 12:30:00"))
+  val materialAlgebra2: Material = Material(Id.auto, Id.auto, "Groups", "Some description", Timestamp.valueOf("2020-12-28 12:30:00"))
+  val materialPhilosophy1: Material = Material(Id.auto, Id.auto, "R.Dekart", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
+  val materialPhilosophy2: Material = Material(Id.auto, Id.auto, "Spinosa", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
+  val materialPhilosophy3: Material = Material(Id.auto, Id.auto, "I.Kant", "Some description", Timestamp.valueOf("2020-12-14 10:00:00"))
 }
 
 object SampleDatabaseContent extends SampleDatabaseContent {
@@ -79,13 +72,19 @@ object SampleDatabaseContent extends SampleDatabaseContent {
 
   def fillDatabase(implicit db: Database): TestData = {
 
-    val usersFull = insertUsers(usersData, users)
-    val coursesFull = insertCourses(coursesData, courses)
-    val groupsFull = insertGroups(groupsData, groups)
+    val coursesFull = insertAndReturnAll(coursesData, courses)
+    val groupsFull = insertAndReturnAll(groupsData, groups)
+    val usersPartiallyFull = Seq(
+      student1.copy(groupId = Some(groupsFull(0).id)),
+      student2.copy(groupId = Some(groupsFull(1).id)),
+      teacher1,
+      teacher2,
+    )
+    val usersFull = insertAndReturnAll(usersPartiallyFull, users)
 
     val studentDataFull = Seq(
-      studentData1.copy(userId = usersFull(0).id, groupId = groupsFull(0).id),
-      studentData2.copy(userId = usersFull(1).id, groupId = groupsFull(1).id))
+      studentData1.copy(userId = usersFull(0).id),
+      studentData2.copy(userId = usersFull(1).id))
     insertRows(studentDataFull, studentData)
 
     val personalDataFull = Seq(
@@ -97,10 +96,10 @@ object SampleDatabaseContent extends SampleDatabaseContent {
     insertRows(personalDataFull, personalData)
 
     val homeworksAlmostFull = Seq(
-      homeworkAlgebra.copy(courseId = coursesFull(0).id, studentId = usersFull(0).id),
-      homeworkPhilosophy.copy(courseId = coursesFull(1).id, studentId = usersFull(1).id)
+      homeworkAlgebra.copy(courseId = coursesFull(0).id),
+      homeworkPhilosophy.copy(courseId = coursesFull(1).id)
     )
-    val homeworksFull = insertHomeworks(homeworksAlmostFull, homeworks)
+    val homeworksFull = insertAndReturnAll(homeworksAlmostFull, homeworks)
 
     val materialsFull = Seq(
       materialAlgebra1.copy(courseId = coursesFull(0).id),
@@ -143,40 +142,10 @@ object SampleDatabaseContent extends SampleDatabaseContent {
       materialsFull)
   }
 
-  private def insertUsers(rows: Seq[User], tableQuery: TableQuery[UserTable])(implicit db: Database): Seq[User] = {
-    val action = for {
-      row <- rows
-    } yield (tableQuery returning tableQuery.map(_.id)) += row
-    val ids = Await.result(db.run(DBIO.sequence(action)), 3.seconds)
-    val usersFull = (ids zip rows).map{ case (id, user) => user.copy(id = id) }
-    usersFull
-  }
-
-  private def insertCourses(rows: Seq[Course], tableQuery: TableQuery[CourseTable])(implicit db: Database): Seq[Course] = {
-    val action = for {
-      row <- rows
-    } yield (tableQuery returning tableQuery.map(_.id)) += row
-    val ids = Await.result(db.run(DBIO.sequence(action)), 3.seconds)
-    val coursesFull = (ids zip rows).map{ case (id, course) => course.copy(id = id) }
-    coursesFull
-  }
-
-  private def insertGroups(rows: Seq[Group], tableQuery: TableQuery[GroupTable])(implicit db: Database): Seq[Group] = {
-    val action = for {
-      row <- rows
-    } yield (tableQuery returning tableQuery.map(_.id)) += row
-    val ids = Await.result(db.run(DBIO.sequence(action)), 3.seconds)
-    val groupsFull = (ids zip rows).map{ case (id, group) => group.copy(id = id) }
-    groupsFull
-  }
-
-  private def insertHomeworks(rows: Seq[Homework], tableQuery: TableQuery[HomeworkTable])(implicit db: Database): Seq[Homework] = {
-    val action = for {
-      row <- rows
-    } yield (tableQuery returning tableQuery.map(_.homeworkId)) += row
-    val ids = Await.result(db.run(DBIO.sequence(action)), 3.seconds)
-    val homeworksFull = (ids zip rows).map{ case (id, homework) => homework.copy(homeworkId = id) }
-    homeworksFull
+  private def insertAndReturnAll[T, Q <: Table[T]]
+    (rows: Seq[T], tableQuery: TableQuery[Q])(implicit db: Database): Seq[T] = {
+    val action = (tableQuery ++= rows).andThen(tableQuery.result)
+    Await.result(db.run(action), 3.seconds)
   }
 
   private def insertRows[T, E <: Table[T]](rows: Seq[T], tableQuery: TableQuery[E])(implicit db: Database): Unit = {

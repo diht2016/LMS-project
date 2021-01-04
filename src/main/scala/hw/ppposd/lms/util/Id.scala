@@ -6,6 +6,6 @@ import slick.lifted.MappedTo
 class Id[+A](val value: Long) extends AnyVal with MappedTo[Long]
 
 object Id {
-  def auto = new Id[Nothing](0)
+  def auto = new Id[Nothing](-1)
   implicit def idJsonFormat[A]: Format[Id[A]] = Json.valueFormat[Id[A]]
 }
