@@ -8,7 +8,7 @@
 - User ({user.id}, fullName, email, password, group.id)
 - CourseTeacher ({course.id, user#teacher.id})
 - CourseTutor ({course.id, user#student.id})
-- StudentData ({user#student.id}, yearOfEnrollment, degree, studyForm, learningBase)
+- StudentData ({user#student.id}, group.id, yearOfEnrollment, degree, studyForm, learningBase)
 - PersonalData ({user.id}, phoneNumber, city, description, vk, facebook, linkedin, instagram)
 - Material ({material.id}, course.id, name, description, creationDate)
 - Homework ({homework.id}, course.id, name, description, startDate, deadlineDate)

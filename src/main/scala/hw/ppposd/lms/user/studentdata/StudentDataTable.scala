@@ -3,9 +3,11 @@ package hw.ppposd.lms.user.studentdata
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 import StudentData._
+import hw.ppposd.lms.group.Group
 import slick.jdbc.H2Profile.api._
 
 case class StudentData(userId: Id[User],
+                       groupId: Id[Group],
                        yearOfEnrollment: Int,
                        degree: Degree,
                        studyForm: StudyForm,
@@ -35,10 +37,11 @@ object StudentData {
 
 class StudentDataTable(tag: Tag) extends Table[StudentData](tag, "student_data") {
   def studentId = column[Id[User]]("student_id", O.PrimaryKey)
+  def groupId = column[Id[Group]]("group_id")
   def yearOfEnrollment = column[Int]("year_of_enrollment")
   def degree = column[Degree]("degree")
   def studyForm =  column[StudyForm]("study_form")
   def learningBase = column[LearningBase]("learning_base")
 
-  def * = (studentId, yearOfEnrollment, degree, studyForm, learningBase) .<> ((StudentData.apply _).tupled, StudentData.unapply)
+  def * = (studentId, groupId, yearOfEnrollment, degree, studyForm, learningBase) .<> ((StudentData.apply _).tupled, StudentData.unapply)
 }

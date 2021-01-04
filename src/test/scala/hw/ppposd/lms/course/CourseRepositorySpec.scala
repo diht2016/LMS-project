@@ -10,9 +10,11 @@ class CourseRepositorySpec extends SpecBaseDb {
   trait testing {
     val repository = new CourseRepositoryImpl()
   }
-
+/*
   "list" should "return all courses" in new testing {
     repository.list().futureValue should be (coursesData)
   }
+  */
+
 }
 
