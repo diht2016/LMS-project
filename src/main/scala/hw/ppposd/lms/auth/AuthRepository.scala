@@ -22,7 +22,7 @@ trait AuthRepository {
   def setPasswordHash(userId: Id[User], passwordHash: String): Future[Int]
 }
 
-class AuthRepositoryImpl extends AuthRepository {
+class AuthRepositoryImpl(implicit db: Database) extends AuthRepository {
   import hw.ppposd.lms.Schema._
 
   override def createSession(userId: Id[User]): Future[String] =

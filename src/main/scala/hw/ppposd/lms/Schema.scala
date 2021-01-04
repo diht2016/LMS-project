@@ -4,11 +4,11 @@ import hw.ppposd.lms.auth.{SessionTable, VerificationTable}
 import hw.ppposd.lms.course.CourseTable
 import hw.ppposd.lms.group.GroupTable
 import hw.ppposd.lms.course.homework.HomeworkTable
-import hw.ppposd.lms.access.{CourseTeacher, CourseTeacherTable, CourseTutorTable, GroupCourseTable}
+import hw.ppposd.lms.access.{CourseTeacherTable, CourseTutorTable, GroupCourseTable}
 import hw.ppposd.lms.course.material.MaterialTable
 import hw.ppposd.lms.course.homework.solution.SolutionTable
 import hw.ppposd.lms.user.UserTable
-import hw.ppposd.lms.user.personaldata.{PersonalData, PersonalDataTable}
+import hw.ppposd.lms.user.personaldata.PersonalDataTable
 import hw.ppposd.lms.user.studentdata.StudentDataTable
 import slick.dbio.DBIO
 import slick.jdbc.JdbcBackend.Database
@@ -17,8 +17,6 @@ import slick.jdbc.H2Profile.api._
 import scala.concurrent.Future
 
 object Schema {
-  implicit lazy val db = Database.forConfig("db")
-
   /**
    * Here are the tables
    */
@@ -37,7 +35,7 @@ object Schema {
   val courseTutorLinks = TableQuery[CourseTutorTable]
   val groupCourseLinks = TableQuery[GroupCourseTable]
 
-  def createSchema(): Future[Unit] = {
+  def createSchema(implicit db: Database): Future[Unit] = {
     val schema = List(
       sessions,
       verifications,

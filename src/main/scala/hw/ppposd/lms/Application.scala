@@ -2,6 +2,7 @@ package hw.ppposd.lms
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.ExecutionContext
 import scala.io.StdIn
@@ -9,8 +10,9 @@ import scala.io.StdIn
 object Application extends App {
   implicit val system: ActorSystem = ActorSystem("lms-system")
   implicit val ec: ExecutionContext = system.dispatcher
+  implicit val db: Database = Database.forConfig("db")
 
-  Schema.createSchema()
+  Schema.createSchema(db)
 
   val route = new RootRouting(new Wiring).route
 

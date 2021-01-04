@@ -19,23 +19,23 @@ class UserController(userRepo: UserRepository, groupRepo: GroupRepository)
       } ~ (path("personal") & patch & entity(as[PersonalDataEntity])) { entity =>
         setPersonalData(userId, entity)
       }
-    } ~ (pathPrefixId[User] & get) { otherUserId =>
+    } ~ (pathPrefixId[User] & pathEnd & get) { otherUserId =>
       getUserData(otherUserId, isSelf = false)
     }
   }
 
   private def getUserData(userId: Id[User], isSelf: Boolean): Future[UserEntity] = {
-    userRepo.find(userId).flatMap {
-      case Some(user) =>
-        val groupOptionFuture = lookupIfSome(user.groupId, groupRepo.find)
-        val personalDataFuture = userRepo.findPersonalData(userId).map(_.get)
-        val studentDataOptionFuture = lookupIfNeeded(user.groupId, userRepo.findStudentData(userId))
-        for {
-          group <- groupOptionFuture
-          personalData <- personalDataFuture
-          studentData <- studentDataOptionFuture
-        } yield modelToUserEntity(user, group, personalData, studentData, isSelf)
-      case None => ApiError(404, "user not found")
+    userRepo.find(userId)
+      .flatMap(assertFound("user"))
+      .flatMap { user =>
+      val groupOptionFuture = lookupIfSome(user.groupId, groupRepo.find)
+      val personalDataFuture = userRepo.findPersonalData(userId).map(_.get)
+      val studentDataOptionFuture = lookupIfNeeded(user.groupId, userRepo.findStudentData(userId))
+      for {
+        group <- groupOptionFuture
+        personalData <- personalDataFuture
+        studentData <- studentDataOptionFuture
+      } yield modelToUserEntity(user, group, personalData, studentData, isSelf)
     }
   }
 

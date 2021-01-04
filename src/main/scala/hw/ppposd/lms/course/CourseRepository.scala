@@ -12,15 +12,15 @@ trait CourseRepository {
   def list(): Future[Seq[Course]]
 }
 
-class CourseRepositoryImpl(implicit database: Database) extends CourseRepository {
+class CourseRepositoryImpl(implicit db: Database) extends CourseRepository {
 
   override def create(name: String, description: String): Future[Id[Course]] =
-    database.run((courses returning courses.map(_.id))
+    db.run((courses returning courses.map(_.id))
       += Course(Id.auto, name, description))
 
   override def find(id: Id[Course]): Future[Option[Course]] =
-    database.run(courses.filter(_.id === id).result.headOption)
+    db.run(courses.filter(_.id === id).result.headOption)
 
   override def list(): Future[Seq[Course]] =
-    database.run(courses.result)
+    db.run(courses.result)
 }
