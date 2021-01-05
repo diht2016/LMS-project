@@ -1,7 +1,6 @@
-package hw.ppposd.lms.access
+package hw.ppposd.lms.group
 
 import hw.ppposd.lms.course.Course
-import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.util.Id
 import slick.jdbc.H2Profile.api._
 

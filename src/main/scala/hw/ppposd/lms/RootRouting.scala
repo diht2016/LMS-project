@@ -4,8 +4,8 @@ import akka.http.scaladsl.server.Route
 
 import scala.concurrent.ExecutionContext
 
-class RootRouting(wiring: Wiring)(implicit ec: ExecutionContext) extends Controller {
-  import wiring.Controllers._
+class RootRouting(wiring: RootWiring)(implicit ec: ExecutionContext) extends Controller {
+  import wiring._
   def route: Route =
     pathPrefix("auth") {
       authController.route

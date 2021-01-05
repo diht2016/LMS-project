@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.{Directive1, Directives, Route}
 import hw.ppposd.lms.util.Id
 import play.api.libs.json.{Json, Writes}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 trait Controller extends Directives {
@@ -97,4 +97,8 @@ trait Controller extends Directives {
     case Some(_) => f
     case None => Future.successful(None)
   }
+
+  def assertTrue[T](conditionFuture: Future[Boolean], error: => Future[T])
+                   (input: T)(implicit ec: ExecutionContext): Future[T] =
+    conditionFuture.flatMap { if (_) Future.successful(input) else error }
 }

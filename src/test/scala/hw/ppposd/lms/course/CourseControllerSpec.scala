@@ -2,7 +2,6 @@ package hw.ppposd.lms.course
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import hw.ppposd.lms.access.{AccessRepository, AccessService, CourseBrief}
 import hw.ppposd.lms.base.RouteSpecBase
 import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.user.User
@@ -14,15 +13,15 @@ class CourseControllerSpec extends RouteSpecBase {
   import CourseControllerSpec._
 
   "CourseController" should "return list of courses" in new TestWiring {
-    accessRepoMock.getUserGroupId _ expects sampleUserId returns
+    accessRepoMock.findUserGroupId _ expects sampleUserId returns
       Future.successful(Some(sampleGroupId))
-    accessRepoMock.listGroupCourseIds _ expects sampleGroupId returns
+    courseRepoMock.listGroupCourseIds _ expects sampleGroupId returns
       Future.successful(Seq(sampleCourseId))
-    accessRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
-      Future.successful(Seq(sampleCourseBrief))
+    courseRepoMock.findCourses _ expects Seq(sampleCourseId) returns
+      Future.successful(Seq(sampleCourse))
 
     private val sampleResponse =
-      s"""[{"id":${sampleCourseId.value},"name":"test course"}]"""
+      s"""[{"id":${sampleCourseId.value},"name":"test course","description":"sample desc"}]"""
 
     Get() ~> route ~> check {
       status should be (StatusCodes.OK)
@@ -59,8 +58,8 @@ class CourseControllerSpec extends RouteSpecBase {
   private trait TestWiring {
     protected val accessRepoMock = mock[AccessRepository]
     protected val courseRepoMock = mock[CourseRepository]
-    protected val accessService = new AccessService(accessRepoMock)
-    protected val controller = new CourseController(courseRepoMock, accessService)
+    protected val wiringMock = mock[CourseWiring]
+    protected val controller = new CourseController(courseRepoMock, accessRepoMock, wiringMock)
     protected val route: Route = controller.route(sampleUserId)
   }
 }
@@ -70,5 +69,4 @@ object CourseControllerSpec {
   private val sampleGroupId = new Id[Group](26)
   private val sampleCourseId = new Id[Course](11)
   private val sampleCourse = Course(sampleCourseId, "test course", "sample desc")
-  private val sampleCourseBrief = CourseBrief(sampleCourseId, "test course")
 }

@@ -23,6 +23,6 @@ class PersonalDataTable(tag: Tag) extends Table[PersonalData](tag, "personal_dat
   def linkedin = column[Option[String]]("linkedin", O.Default(None))
   def instagram = column[Option[String]]("instagram", O.Default(None))
 
-  def * = (userId, phoneNumber, city, description, vk, facebook, linkedin, instagram) <>
-    (PersonalData.tupled, PersonalData.unapply)
+  def * = (userId, phoneNumber, city, description, vk, facebook, linkedin, instagram)
+   .<> (PersonalData.tupled, PersonalData.unapply)
 }

@@ -1,4 +1,4 @@
-package hw.ppposd.lms.access
+package hw.ppposd.lms.course.tutor
 
 import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.user.User

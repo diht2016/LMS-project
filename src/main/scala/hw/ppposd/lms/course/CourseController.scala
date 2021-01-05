@@ -2,40 +2,27 @@ package hw.ppposd.lms.course
 
 import akka.http.scaladsl.server.Route
 import hw.ppposd.lms.Controller
-import hw.ppposd.lms.access.AccessService
+import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CourseController(courseRepo: CourseRepository, accessService: AccessService)
+class CourseController(courseRepo: CourseRepository, accessRepo: AccessRepository, wiring: CourseWiring)
                       (implicit ec: ExecutionContext) extends Controller {
+  import wiring._
   def route(userId: Id[User]): Route = {
     (pathEndOrSingleSlash & get) {
-      accessService.listUserCourseBriefs(userId)
+      listUserCourses(userId)
     } ~ pathPrefixId[Course] { courseId => concat (
       (pathEnd & get) {
         getCourse(courseId)
       },
       (path("teachers") & get) {
-        accessService.listCourseTeacherBriefs(courseId)
+        teacherController.route(userId, courseId)
       },
       pathPrefix("tutors") {
-        (pathEnd & get) {
-          accessService.listCourseTutorBriefs(courseId)
-        } ~ (pathEnd & post) {
-          complete("")
-        } ~ (pathPrefixId[User] & pathEnd & post) { otherUserId =>
-          accessService.canManageTutors(userId, courseId).flatMap {
-            case true => addTutor(courseId, otherUserId)
-            case false => ApiError(403, "not authorized to add tutors")
-          }
-        } ~ (pathPrefixId[User] & pathEnd & delete) { otherUserId =>
-          accessService.canManageTutors(userId, courseId).flatMap {
-            case true => deleteTutor(courseId, otherUserId)
-            case false => ApiError(403, "not authorized to delete tutors")
-          }
-        }
+        tutorController.route(userId, courseId)
       },
       pathPrefix("materials") {
         complete(s"material controller") // todo
@@ -49,7 +36,20 @@ class CourseController(courseRepo: CourseRepository, accessService: AccessServic
   def getCourse(courseId: Id[Course]): Future[Course] =
     courseRepo.find(courseId).flatMap(assertFound("course"))
 
-  def addTutor(courseId: Id[Course], userId: Id[User]): Future[Unit] = ???
+  def listUserCourses(userId: Id[User]): Future[Seq[Course]] = {
+    matchUserType(userId) (
+      ifStudent = groupId => courseRepo.listGroupCourseIds(groupId),
+      ifTeacher = courseRepo.listTeacherCourseIds(userId)
+    ).flatMap(courseRepo.findCourses)
+  }
 
-  def deleteTutor(courseId: Id[Course], userId: Id[User]): Future[Unit] = ???
+  def matchUserType[T](userId: Id[User])
+                      (ifStudent: Id[Group] => Future[T], ifTeacher: => Future[T]): Future[T] = {
+    val groupIdOptFuture = accessRepo.findUserGroupId(userId)
+    groupIdOptFuture.flatMap {
+      case Some(groupId) => ifStudent(groupId)
+      case None => ifTeacher
+    }
+  }
+
 }

@@ -2,13 +2,14 @@ package hw.ppposd.lms
 
 import java.sql.Timestamp
 
-import hw.ppposd.lms.access.{CourseTeacher, CourseTutor, GroupCourse}
-import hw.ppposd.lms.course.{Course, CourseTable}
-import hw.ppposd.lms.course.homework.{Homework, HomeworkTable}
+import hw.ppposd.lms.course.Course
+import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution
 import hw.ppposd.lms.course.material.Material
-import hw.ppposd.lms.group.{Group, GroupTable}
-import hw.ppposd.lms.user.{User, UserTable}
+import hw.ppposd.lms.course.teacher.CourseTeacher
+import hw.ppposd.lms.course.tutor.CourseTutor
+import hw.ppposd.lms.group.{Group, GroupCourse}
+import hw.ppposd.lms.user.User
 import hw.ppposd.lms.user.personaldata.PersonalData
 import hw.ppposd.lms.user.studentdata.StudentData
 import hw.ppposd.lms.user.studentdata.StudentData.{Degree, LearningBase, StudyForm}
@@ -18,7 +19,7 @@ import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 
 trait SampleDatabaseContent {
   val algebraCourse: Course = Course(Id.auto, "Linear algebra", "Some description")

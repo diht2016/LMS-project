@@ -14,7 +14,7 @@ object Application extends App {
 
   Schema.createSchema(db)
 
-  val route = new RootRouting(new Wiring).route
+  val route = new RootRouting(new RootWiringImpl).route
 
   val port = 8080 // todo: move to config
   val binding = Http().newServerAt("localhost", port).bind(route)
