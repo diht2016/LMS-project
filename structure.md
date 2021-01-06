@@ -63,7 +63,7 @@
     - `GET /courses/{course.id}/homeworks`
 * Teacher
   - manage Tutors (add, delete)
-    - `POST /courses/{course.id}/tutors (user.id)`
+    - `POST /courses/{course.id}/tutors/{user.id}`
     - `DELETE /courses/{course.id}/tutors/{user.id}`
   - manage Homeworks (add, edit, delete)
     - `POST /courses/{course.id}/homeworks (name, description, startDate, deadlineDate)`

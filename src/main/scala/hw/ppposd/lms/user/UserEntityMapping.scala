@@ -13,6 +13,7 @@ object UserEntityMapping {
                         studentDataOption: Option[StudentData],
                         showLearningBase: Boolean): UserEntity =
     UserEntity(
+      user.id,
       user.fullName,
       user.email,
       personalData.into[PersonalDataEntity].transform,

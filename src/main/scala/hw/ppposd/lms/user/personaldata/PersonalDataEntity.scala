@@ -15,7 +15,7 @@ object PersonalDataEntity extends PlayJsonSupport {
   implicit val personalDataEntityFormat: Format[PersonalDataEntity] = Json.format[PersonalDataEntity]
 
   private val checkList = List[PersonalDataEntity => Option[String]](
-    validate(_.phoneNumber, isPhoneValid, "invalid phone"),
+    validate(_.phoneNumber, isPhoneValid, "invalid phone number"),
     validate(_.vk, isLinkValid("vk.com"), "invalid vk link"),
     validate(_.facebook, isLinkValid("facebook.com"), "invalid facebook link"),
     validate(_.linkedin, isLinkValid("linkedin.com"), "invalid linkedin link"),
