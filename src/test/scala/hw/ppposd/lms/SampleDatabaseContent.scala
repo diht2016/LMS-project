@@ -21,87 +21,85 @@ import slick.jdbc.H2Profile.api._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.Await
 
-trait SampleDatabaseContent {
-  val algebraCourse: Course = Course(Id.auto, "Linear algebra", "Some description")
-  val philosophyCourse: Course = Course(Id.auto, "Philosophy", "Some description")
-  val coursesData = Seq(algebraCourse, philosophyCourse)
+object SampleDatabaseContent {
+  val algebraCourse: Course = Course(id(11), "Linear algebra", "Some description")
+  val philosophyCourse: Course = Course(id(12), "Philosophy", "Some description")
 
-  val student1: User = User(Id.auto, "Ivan Kozlov", "i.kozlov@lms.ru", "", None)
-  val student2: User = User(Id.auto, "Daria Titova", "d.titova@lms.ru", "", None)
-  val teacher1: User = User(Id.auto, "Alexey Soloviov", "a.soloviov@lms.ru", "", None)
-  val teacher2: User = User(Id.auto, "Maria Gorbunova", "m.gorbunova@lms.ru", "", None)
+  val group1: Group = Group(id(21), "001", "Art and Science", 3)
+  val group2: Group = Group(id(22), "002", "Biology", 2)
 
-  val personalDataSt1: PersonalData = PersonalData(Id.auto, Some("89999999999"), Some("Voronezh"), None, Some("http://vk.com/ikozlov"), None, None, None)
-  val personalDataSt2: PersonalData = PersonalData(Id.auto, Some("87777777777"), Some("Tomsk"), None, None, None, None, Some("link"))
-  val personalDataT1: PersonalData = PersonalData(Id.auto, Some("86666666666"), Some("Kazan"), Some("Professor. Algebra course."), None, None, None, None)
-  val personalDataT2: PersonalData = PersonalData(Id.auto, Some("85555555555"), Some("Yakutsk"), Some("Professor. Philosophy course."), None, None, None, None)
+  val student1: User = User(id(1), "Ivan Kozlov", "i.kozlov@lms.ru", "", Some(id(21)))
+  val student2: User = User(id(2), "Daria Titova", "d.titova@lms.ru", "", Some(id(22)))
+  val teacher1: User = User(id(3), "Alexey Soloviov", "a.soloviov@lms.ru", "", None)
+  val teacher2: User = User(id(4), "Maria Gorbunova", "m.gorbunova@lms.ru", "", None)
 
-  val group1: Group = Group(Id.auto, "001", "Art and Science", 3)
-  val group2: Group = Group(Id.auto, "002", "Biology", 2)
-  val groupsData = Seq(group1, group2)
+  val personalDataS1: PersonalData = PersonalData(id(1), Some("89999999999"), Some("Voronezh"), None, Some("https://vk.com/ikozlov"), None, None, None)
+  val personalDataS2: PersonalData = PersonalData(id(2), Some("87777777777"), Some("Tomsk"), None, None, None, None, Some("https://instagram/_daria_"))
+  val personalDataT1: PersonalData = PersonalData(id(3), Some("86666666666"), Some("Kazan"), Some("Professor. Algebra course."), None, None, None, None)
+  val personalDataT2: PersonalData = PersonalData(id(4), Some("85555555555"), Some("Yakutsk"), Some("Professor. Philosophy course."), None, None, None, None)
 
-  val studentData1: StudentData = StudentData(Id.auto, 2018, Degree.Bachelor, StudyForm.Intramural, LearningBase.Budget)
-  val studentData2: StudentData = StudentData(Id.auto, 2015, Degree.Master, StudyForm.Evening, LearningBase.Contract)
+  val studentData1: StudentData = StudentData(id(1), 2018, Degree.Bachelor, StudyForm.Intramural, LearningBase.Budget)
+  val studentData2: StudentData = StudentData(id(2), 2015, Degree.Master, StudyForm.Evening, LearningBase.Contract)
 
   val homeworkAlgebra1: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(81),
+    id(11),
     "Matrices",
     "Ex 1-10",
     Timestamp.valueOf("2021-1-1 10:00:00"),
     Timestamp.valueOf("2021-1-7 00:00:00"))
 
   val homeworkAlgebra2: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(82),
+    id(11),
     "Groups",
     "Ex 1-10",
     Timestamp.valueOf("2020-12-1 10:00:00"),
     Timestamp.valueOf("2020-12-7 00:00:00"))
   val homeworkAlgebra3: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(83),
+    id(11),
     "Rotations",
     "Ex 1-10",
     Timestamp.valueOf("2020-12-8 10:00:00"),
     Timestamp.valueOf("2020-12-14 00:00:00"))
   val homeworkPhilosophy1: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(84),
+    id(12),
     "R.Descartes",
     "Make a report",
     Timestamp.valueOf("2021-2-1 10:00:00"),
     Timestamp.valueOf("2021-2-7 00:00:00"))
   val homeworkPhilosophy2: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(85),
+    id(12),
     "Spinoza",
     "Make a report",
     Timestamp.valueOf("2021-2-8 10:00:00"),
     Timestamp.valueOf("2021-2-14 00:00:00"))
   val homeworkPhilosophy3: Homework = Homework(
-    Id.auto,
-    Id.auto,
+    id(86),
+    id(12),
     "I.Kant",
     "Make a report",
     Timestamp.valueOf("2020-12-14 10:00:00"),
     Timestamp.valueOf("2020-12-11 00:00:00"))
 
-  val solutionAlgebraSt1: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2021-1-3 12:30:00"))
-  val solutionPhilosophySt2: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
+  val solutionAlgebraSt1: Solution = Solution(id(81), id(1), "Some text", Timestamp.valueOf("2021-01-03 12:30:00"))
+  val solutionPhilosophySt2: Solution = Solution(id(82), id(2), "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
 
-  val materialAlgebra1: Material = Material(Id.auto, Id.auto, "Matrices", "Some description", Timestamp.valueOf("2020-12-25 12:30:00"))
-  val materialAlgebra2: Material = Material(Id.auto, Id.auto, "Groups", "Some description", Timestamp.valueOf("2020-12-28 12:30:00"))
-  val materialPhilosophy1: Material = Material(Id.auto, Id.auto, "R.Descartes", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
-  val materialPhilosophy2: Material = Material(Id.auto, Id.auto, "Spinoza", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
-  val materialPhilosophy3: Material = Material(Id.auto, Id.auto, "I.Kant", "Some description", Timestamp.valueOf("2020-12-14 10:00:00"))
+  val materialAlgebra1: Material = Material(id(71), id(11), "Matrices", "Some description", Timestamp.valueOf("2020-12-25 12:30:00"))
+  val materialAlgebra2: Material = Material(id(72), id(11),  "Groups", "Some description", Timestamp.valueOf("2020-12-28 12:30:00"))
+  val materialPhilosophy1: Material = Material(id(73), id(12), "R.Descartes", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
+  val materialPhilosophy2: Material = Material(id(74), id(12), "Spinoza", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
+  val materialPhilosophy3: Material = Material(id(75), id(12), "I.Kant", "Some description", Timestamp.valueOf("2020-12-14 10:00:00"))
 
-}
 
-object SampleDatabaseContent extends SampleDatabaseContent {
-  import Schema._
+  val coursesData = Seq(algebraCourse, philosophyCourse)
+  val groupsData = Seq(group1, group2)
 
   def fillDatabase(implicit db: Database): TestData = {
+    import Schema._
 
     val coursesFull = insertAndReturnAll(coursesData, courses)
     val groupsFull = insertAndReturnAll(groupsData, groups)
@@ -119,8 +117,8 @@ object SampleDatabaseContent extends SampleDatabaseContent {
     insertRows(studentDataFull, studentData)
 
     val personalDataFull = Seq(
-      personalDataSt1.copy(userId = usersFull(0).id),
-      personalDataSt2.copy(userId = usersFull(1).id),
+      personalDataS1.copy(userId = usersFull(0).id),
+      personalDataS2.copy(userId = usersFull(1).id),
       personalDataT1.copy(userId = usersFull(2).id),
       personalDataT2.copy(userId = usersFull(3).id)
     )
@@ -187,4 +185,6 @@ object SampleDatabaseContent extends SampleDatabaseContent {
   private def insertRows[T, E <: Table[T]](rows: Seq[T], tableQuery: TableQuery[E])(implicit db: Database): Unit = {
     Await.result(db.run(DBIO.seq(tableQuery ++= rows)), 3.seconds)
   }
+
+  private def id[T](v: Long): Id[T] = new Id[T](v)
 }
