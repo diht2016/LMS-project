@@ -21,6 +21,7 @@ class HomeworkTable(tag: Tag) extends Table[Homework](tag, "homeworks"){
   def startDate = column[Timestamp]("start_date")
   def deadlineDate = column[Timestamp]("deadline_date")
 
-  def * = (homeworkId, courseId, name, description, startDate, deadlineDate) <>
-    (Homework.tupled, Homework.unapply)
+
+  def * = (homeworkId, courseId, name, description, startDate, deadlineDate)
+    .<> (Homework.tupled, Homework.unapply)
 }

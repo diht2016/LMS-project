@@ -1,7 +1,6 @@
-package hw.ppposd.lms.access
+package hw.ppposd.lms.user
 
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
-import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 import play.api.libs.json.{Json, Writes}
 
