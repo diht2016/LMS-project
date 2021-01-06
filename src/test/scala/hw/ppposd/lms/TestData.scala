@@ -1,7 +1,5 @@
 package hw.ppposd.lms
 
-import java.sql.Timestamp
-
 import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution

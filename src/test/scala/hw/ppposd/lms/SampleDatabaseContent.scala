@@ -47,30 +47,56 @@ trait SampleDatabaseContent {
   lazy val studentData1: StudentData = StudentData(Id.auto, Id.auto, 2018, Degree.Bachelor, StudyForm.Intramural, LearningBase.Budget)
   lazy val studentData2: StudentData = StudentData(Id.auto, Id.auto, 2015, Degree.Master, StudyForm.Evening, LearningBase.Contract)
 
-  lazy val homeworkAlgebra: Homework = Homework(
-    Id.auto,
+  lazy val homeworkAlgebra1: Homework = Homework(
     Id.auto,
     Id.auto,
     "Matrices",
     "Ex 1-10",
     Timestamp.valueOf("2021-1-1 10:00:00"),
     Timestamp.valueOf("2021-1-7 00:00:00"))
-  lazy val homeworkPhilosophy: Homework = Homework(
+  lazy val homeworkAlgebra2: Homework = Homework(
     Id.auto,
     Id.auto,
-    Id.auto,
-    "R.Dekart",
-    "Make a report",
+    "Groups",
+    "Ex 1-10",
     Timestamp.valueOf("2020-12-1 10:00:00"),
+    Timestamp.valueOf("2020-12-7 00:00:00"))
+  lazy val homeworkAlgebra3: Homework = Homework(
+    Id.auto,
+    Id.auto,
+    "Rotations",
+    "Ex 1-10",
+    Timestamp.valueOf("2020-12-8 10:00:00"),
     Timestamp.valueOf("2020-12-14 00:00:00"))
+  lazy val homeworkPhilosophy1: Homework = Homework(
+    Id.auto,
+    Id.auto,
+    "R.Descartes",
+    "Make a report",
+    Timestamp.valueOf("2021-2-1 10:00:00"),
+    Timestamp.valueOf("2021-2-7 00:00:00"))
+  lazy val homeworkPhilosophy2: Homework = Homework(
+    Id.auto,
+    Id.auto,
+    "Spinoza",
+    "Make a report",
+    Timestamp.valueOf("2021-2-8 10:00:00"),
+    Timestamp.valueOf("2021-2-14 00:00:00"))
+  lazy val homeworkPhilosophy3: Homework = Homework(
+    Id.auto,
+    Id.auto,
+    "I.Kant",
+    "Make a report",
+    Timestamp.valueOf("2020-12-14 10:00:00"),
+    Timestamp.valueOf("2020-12-11 00:00:00"))
 
   lazy val solutionAlgebraSt1: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2021-1-3 12:30:00"))
   lazy val solutionPhilosophySt2: Solution = Solution(Id.auto, Id.auto, "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
 
   lazy val materialAlgebra1: Material = Material(Id.auto, Id.auto, "Matrices", "Some description", Timestamp.valueOf("2020-12-25 12:30:00"))
   lazy val materialAlgebra2: Material = Material(Id.auto, Id.auto, "Groups", "Some description", Timestamp.valueOf("2020-12-28 12:30:00"))
-  lazy val materialPhilosophy1: Material = Material(Id.auto, Id.auto, "R.Dekart", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
-  lazy val materialPhilosophy2: Material = Material(Id.auto, Id.auto, "Spinosa", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
+  lazy val materialPhilosophy1: Material = Material(Id.auto, Id.auto, "R.Descartes", "Some description", Timestamp.valueOf("2020-12-1 10:00:00"))
+  lazy val materialPhilosophy2: Material = Material(Id.auto, Id.auto, "Spinoza", "Some description", Timestamp.valueOf("2020-12-7 10:00:00"))
   lazy val materialPhilosophy3: Material = Material(Id.auto, Id.auto, "I.Kant", "Some description", Timestamp.valueOf("2020-12-14 10:00:00"))
 }
 
@@ -97,9 +123,14 @@ object SampleDatabaseContent extends SampleDatabaseContent {
     insertRows(personalDataFull, personalData)
 
     val homeworksAlmostFull = Seq(
-      homeworkAlgebra.copy(courseId = coursesFull(0).id, studentId = usersFull(0).id),
-      homeworkPhilosophy.copy(courseId = coursesFull(1).id, studentId = usersFull(1).id)
+      homeworkAlgebra1.copy(courseId = coursesFull(0).id),
+      homeworkAlgebra2.copy(courseId = coursesFull(0).id),
+      homeworkAlgebra3.copy(courseId = coursesFull(0).id),
+      homeworkPhilosophy1.copy(courseId = coursesFull(1).id),
+      homeworkPhilosophy2.copy(courseId = coursesFull(1).id),
+      homeworkPhilosophy3.copy(courseId = coursesFull(1).id)
     )
+
     val homeworksFull = insertHomeworks(homeworksAlmostFull, homeworks)
 
     val materialsFull = Seq(
