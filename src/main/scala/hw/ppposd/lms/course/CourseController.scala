@@ -25,10 +25,10 @@ class CourseController(courseRepo: CourseRepository, accessRepo: AccessRepositor
         tutorController.route(userId, courseId)
       },
       pathPrefix("materials") {
-        complete(s"material controller") // todo
+        materialController.route(userId, courseId)
       },
       pathPrefix("homeworks") {
-        complete(s"homework controller") // todo
+        homeworkController.route(userId, courseId)
       },
     )}
   }

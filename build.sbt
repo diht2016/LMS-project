@@ -22,3 +22,6 @@ libraryDependencies += "org.scalamock" %% "scalamock" % "4.4.0" % Test
 
 libraryDependencies += "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test
 libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test
+libraryDependencies += "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
+
+libraryDependencies += "io.spray" %% "spray-json" % "1.3.6"
