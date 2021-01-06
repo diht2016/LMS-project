@@ -74,7 +74,7 @@
   - view sorted list of Solutions for Homework
     - `GET /courses/{course.id}/homeworks/{homeworks.id}/solutions`
   - view Solution text
-    - `GET /courses/{course.id}/homeworks/{homeworks.id}/solutions/{solution.id}`
+    - `GET /courses/{course.id}/homeworks/{homeworks.id}/solutions/{student.id}`
 * Student
   - set own Solution for Homework (if date fits limits)
     - `POST /courses/{course.id}/homeworks/{homeworks.id}/solutions (text)`

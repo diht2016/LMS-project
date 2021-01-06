@@ -53,6 +53,7 @@ trait HomeworkRepository {
    * @return Homework with a given id if it exists, None otherwise.
    */
   def find(id: Id[Homework]): Future[Option[Homework]]
+
 }
 
 class HomeworkRepositoryImpl(implicit db: Database) extends HomeworkRepository {

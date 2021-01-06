@@ -68,7 +68,7 @@ class MaterialController(materialRepo: MaterialRepository, accessRepo: AccessRep
 
   private def canManageMaterials(userId: Id[User], courseId: Id[Course]): Future[Boolean] = {
     val isTeacher = accessRepo.isCourseTeacher(userId, courseId)
-    val isTutor = accessRepo.isCourseTeacher(userId, courseId)
+    val isTutor = accessRepo.isCourseTutor(userId, courseId)
     Future.find(List(isTeacher, isTutor)) { _ == true } map { _.isDefined }
   }
 }
