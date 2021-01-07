@@ -1,6 +1,6 @@
 package hw.ppposd.lms.base
 
-import akka.http.scaladsl.model.HttpMethods.{PATCH, POST}
+import akka.http.scaladsl.model.HttpMethods.{PATCH, POST, PUT}
 import akka.http.scaladsl.model.{ContentTypes, HttpMethod, HttpRequest}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import hw.ppposd.lms.base.JsonSerializer.toJsonString
@@ -16,6 +16,7 @@ trait RouteSpecBase extends SpecBase
   }
 
   val PostJson = new JsonRequestBuilder(POST)
+  val PutJson = new JsonRequestBuilder(PUT)
   val PatchJson = new JsonRequestBuilder(PATCH)
 
   val okResponse = """{"success":true}"""

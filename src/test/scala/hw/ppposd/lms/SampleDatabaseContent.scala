@@ -132,17 +132,16 @@ object SampleDatabaseContent {
       homeworkPhilosophy2.copy(courseId = coursesFull(1).id),
       homeworkPhilosophy3.copy(courseId = coursesFull(1).id)
     )
-
     val homeworksFull = insertAndReturnAll(homeworksAlmostFull, homeworks)
 
-    val materialsFull = Seq(
+    val materialsAlmostFull = Seq(
       materialAlgebra1.copy(courseId = coursesFull(0).id),
       materialAlgebra2.copy(courseId = coursesFull(0).id),
       materialPhilosophy1.copy(courseId = coursesFull(1).id),
       materialPhilosophy2.copy(courseId = coursesFull(1).id),
       materialPhilosophy3.copy(courseId = coursesFull(1).id)
     )
-    insertRows(materialsFull, materials)
+    val materialsFull = insertAndReturnAll(materialsAlmostFull, materials)
 
     val solutionsFull = Seq(
       solutionAlgebraSt1.copy(studentId = usersFull(0).id, homeworkId = homeworksFull(0).homeworkId),

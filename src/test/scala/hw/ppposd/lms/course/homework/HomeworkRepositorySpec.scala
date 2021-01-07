@@ -8,20 +8,20 @@ import hw.ppposd.lms.util.Id
 
 class HomeworkRepositorySpec extends DatabaseSpecBase{
 
-  "findA" should "find a homework with a given id" in new TestWiring {
-    whenReady(repo.find(testData.homeworks(2).homeworkId), oneSecond) {
+  "find" should "find a homework with a given id" in new TestWiring {
+    whenReady(repo.find(testData.homeworks(2).homeworkId)) {
       _ should be (Some(testData.homeworks(2)))
     }
   }
 
   "listAll" should "return all homeworks for the course" in new TestWiring {
-    whenReady(repo.listAll(testData.courses(0).id), oneSecond){
+    whenReady(repo.listAll(testData.courses(0).id)) {
       _.toList should be (testData.homeworks.slice(0, 3))
     }
   }
 
-  "listOpened" should "return only homework which have startDate less or equal to the current" in new TestWiring {
-    whenReady(repo.listOpened(testData.courses(1).id), oneSecond){
+  "listAvailable" should "return homeworks with startDate not greater than current date" in new TestWiring {
+    whenReady(repo.listAvailable(testData.courses(1).id)) {
       _.toList should be (List(testData.homeworks(5)))
     }
   }
@@ -33,9 +33,9 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
       Timestamp.valueOf("2020-11-1 10:00:00"),
       Timestamp.valueOf("2020-11-7 10:00:00"))
 
-    whenReady(repo.add(hw.courseId, hw.name, hw.description, hw.startDate, hw.deadlineDate), oneSecond) { newId =>
+    whenReady(repo.add(hw.courseId, hw.name, hw.description, hw.startDate, hw.deadlineDate)) { newId =>
       val newHw = hw.copy(homeworkId = newId)
-      whenReady(repo.find(newId), oneSecond) { res =>
+      whenReady(repo.find(newId)) { res =>
         res should be (Some(newHw))
       }
     }
@@ -46,23 +46,21 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
     val newDeadlineDate = Timestamp.valueOf("2020-11-21 10:00:00")
     val hwToEdit = testData.homeworks(5)
     val hwEdited = hwToEdit.copy(startDate = newStartDate, deadlineDate = newDeadlineDate)
-    whenReady(repo.edit(hwToEdit.homeworkId, hwToEdit.name, hwToEdit.description, newStartDate, newDeadlineDate), oneSecond) {
-      _ should be (Some(hwEdited))
-    }
-  }
-
-  "edit" should "return None if homework doesn't exist" in new TestWiring {
-    val someDate = Timestamp.valueOf("2020-11-21 10:00:00")
-    whenReady(repo.edit(new Id[Homework](11111), "", "", someDate, someDate), oneSecond) {
-      _ should be (None)
+    whenReady(repo.edit(hwToEdit.homeworkId, hwToEdit.name, hwToEdit.description, newStartDate, newDeadlineDate)) { rowsChanged =>
+      rowsChanged should be (1)
+      whenReady(repo.find(hwToEdit.homeworkId)) {
+        _ should be (Some(hwEdited))
+      }
     }
   }
 
   "delete" should "drop the homework with a given id" in new TestWiring {
-    val idToDelete = testData.homeworks(3).homeworkId
-    val idCourse = testData.courses(1).id
-    whenReady(repo.delete(idCourse, idToDelete), oneSecond){
-      _.toList should be (testData.homeworks.slice(4, 6))
+    private val homeworkToDelete = testData.homeworks(3)
+    whenReady(repo.delete(homeworkToDelete.homeworkId)) { rowsChanged =>
+      rowsChanged should be (1)
+      whenReady(repo.listAll(homeworkToDelete.courseId)) {
+        _.toList should be (testData.homeworks.slice(4, 6))
+      }
     }
   }
 

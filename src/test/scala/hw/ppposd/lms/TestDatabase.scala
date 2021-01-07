@@ -4,10 +4,11 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import slick.jdbc.JdbcBackend.Database
 
+import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-
 import scala.language.postfixOps
+import scala.util.{Failure, Try}
 
 object TestDatabase {
   lazy val (db, testData) = initializeDatabase()
@@ -31,7 +32,16 @@ object TestDatabase {
 
   def restoreDatabase(): Unit = copyFile(dbBackupFilePath, dbFilePath)
 
+  @tailrec
   private def copyFile(src: String, dst: String): Unit = {
-    Files.copy(Paths.get(src), Paths.get(dst), StandardCopyOption.REPLACE_EXISTING)
+    Try {
+      Files.copy(Paths.get(src), Paths.get(dst), StandardCopyOption.REPLACE_EXISTING)
+    } match {
+      case Failure(_) =>
+        // file is occupied, wait and retry
+        Thread.sleep(100)
+        copyFile(src, dst)
+      case _ => ()
+    }
   }
 }

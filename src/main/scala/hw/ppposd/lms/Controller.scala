@@ -101,4 +101,8 @@ trait Controller extends Directives {
   def assertTrue[T](conditionFuture: Future[Boolean], error: => Future[T])
                    (input: T)(implicit ec: ExecutionContext): Future[T] =
     conditionFuture.flatMap { if (_) Future.successful(input) else error }
+
+  def checkCondition[T](error: => Future[T])(conditionFuture: Future[Boolean])
+                       (input: => Future[T])(implicit ec: ExecutionContext): Future[T] =
+    conditionFuture.flatMap { if (_) input else error }
 }

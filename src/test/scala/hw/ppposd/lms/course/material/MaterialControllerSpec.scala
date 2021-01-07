@@ -1,56 +1,165 @@
 package hw.ppposd.lms.course.material
 
-import java.sql.Timestamp
-
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
+import hw.ppposd.lms.base.JsonSerializer.toJsonString
 import hw.ppposd.lms.base.RouteSpecBase
-import hw.ppposd.lms.course.{AccessRepository, Course, CourseWiring}
-import hw.ppposd.lms.user.User
-import hw.ppposd.lms.util.Id
+import hw.ppposd.lms.course.AccessRepository
+import hw.ppposd.lms.course.material.MaterialController.MaterialEntity
+
+import scala.concurrent.Future
 
 class MaterialControllerSpec extends RouteSpecBase {
   import MaterialControllerSpec._
 
   "MaterialController" should "return list of course materials" in new TestWiring {
+    materialRepoMock.list _ expects sampleCourseId returns
+      Future.successful(sampleMaterials)
 
+    Get() ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (sampleListResponse)
+    }
   }
 
-  it should "create new material if user is a teacher/tutor" in new TestWiring {
+  it should "create new material if user is a teacher" in new TestWiring {
+    (materialRepoMock.add _).expects (sampleCourseId, sampleMaterial.name, sampleMaterial.description) returns
+      Future.successful(sampleMaterialId)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
 
+    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (sampleMaterialId.toString)
+    }
   }
 
-  it should "throw error 403 if not teacher/tutor is trying to create new material" in new TestWiring {
+  it should "create new material if user is a tutor" in new TestWiring {
+    (materialRepoMock.add _).expects (sampleCourseId, sampleMaterial.name, sampleMaterial.description) returns
+      Future.successful(sampleMaterialId)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
 
+    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (sampleMaterialId.toString)
+    }
   }
 
-  it should "delete  material if user is a teacher/tutor" in new TestWiring {
+  it should "respond with 403 if other user is trying to create new material" in new TestWiring {
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
 
+    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.Forbidden)
+      responseAs[String] should be (errorResponse)
+    }
   }
 
-  it should "throw error 403 if not teacher/tutor is trying to delete material" in new TestWiring {
+  it should "edit material if user is a teacher" in new TestWiring {
+    (materialRepoMock.edit _).expects (sampleMaterialId, sampleMaterial.name, sampleMaterial.description) returns
+      Future.successful(1)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
 
+    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (okResponse)
+    }
   }
 
-  it should "edit material if user is a teacher/tutor" in new TestWiring {
+  it should "edit material if user is a tutor" in new TestWiring {
+    (materialRepoMock.edit _).expects (sampleMaterialId, sampleMaterial.name, sampleMaterial.description) returns
+      Future.successful(1)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
 
+    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (okResponse)
+    }
   }
 
-  it should "throw error 403 if not teacher/tutor is trying to edit material" in new TestWiring {
+  it should "respond with 403 if other user is trying to edit material" in new TestWiring {
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
 
+    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+      status should be (StatusCodes.Forbidden)
+      responseAs[String] should be (errorResponse)
+    }
+  }
+
+  it should "delete material if user is a teacher" in new TestWiring {
+    (materialRepoMock.delete _).expects (sampleMaterialId) returns
+      Future.successful(1)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+
+    Delete(s"/$sampleMaterialId") ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (okResponse)
+    }
+  }
+
+  it should "delete material if user is a tutor" in new TestWiring {
+    (materialRepoMock.delete _).expects (sampleMaterialId) returns
+      Future.successful(1)
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(true)
+
+    Delete(s"/$sampleMaterialId") ~> route ~> check {
+      status should be (StatusCodes.OK)
+      responseAs[String] should be (okResponse)
+    }
+  }
+
+  it should "respond with 403 if other user is trying to delete material" in new TestWiring {
+    (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+    (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
+      Future.successful(false)
+
+    Delete(s"/$sampleMaterialId") ~> route ~> check {
+      status should be (StatusCodes.Forbidden)
+      responseAs[String] should be (errorResponse)
+    }
   }
 
   trait TestWiring {
     val accessRepoMock: AccessRepository = mock[AccessRepository]
     val materialRepoMock: MaterialRepository = mock[MaterialRepository]
-    val wiringMock: CourseWiring = mock[CourseWiring]
     val controller = new MaterialController(materialRepoMock, accessRepoMock)
+    val route: Route = controller.route(sampleUserId, sampleCourseId)
   }
 }
 
 object MaterialControllerSpec {
-  val sampleUserId = new Id[User](234)
-  val sampleCourseId = new Id[Course](11)
-  val sampleMaterialId = new Id[Material](71)
-  val creationDate = Timestamp.valueOf("2020-12-25 12:30:00")
+  import hw.ppposd.lms.SampleDatabaseContent._
 
-  val sampleMaterial = Material(sampleMaterialId, sampleCourseId, "name", "description", creationDate)
+  private val sampleUserId = student1.id
+  private val sampleCourseId = materialAlgebra1.courseId
+  private val sampleMaterialId = materialAlgebra1.materialId
+  private val sampleMaterial = materialAlgebra1
+  private val sampleMaterialEntity =
+    MaterialEntity(sampleMaterial.name, sampleMaterial.description)
+  private val sampleMaterials = Seq(materialAlgebra1, materialAlgebra2)
+  private val sampleListResponse = toJsonString(sampleMaterials)
+  private val errorResponse = """{"error":"not permitted to manage materials"}"""
 }

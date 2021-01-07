@@ -8,9 +8,10 @@ import akka.http.scaladsl.server.Route
 import com.fasterxml.jackson.core.JsonParseException
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
-import hw.ppposd.lms.course.homework.HomeworkController.HomeworkRequest
+import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.user.User
+import hw.ppposd.lms.util.FutureUtils.failOnFalseWith
 import hw.ppposd.lms.util.Id
 import play.api.libs.json.Json.{fromJson, toJson}
 import play.api.libs.json.{Format, JsResult, JsString, JsValue, Json, Writes}
@@ -22,98 +23,58 @@ class HomeworkController(homeworkRepo: HomeworkRepository,
                         (implicit ec: ExecutionContext) extends Controller {
 
   def route(userId: Id[User], courseId: Id[Course]): Route = {
-    (pathEnd & get) {
-      listHomeworksOfCourse(userId, courseId)
-    } ~ (pathEnd & post & patch & entity(as[HomeworkRequest])) { hw =>
-        createNewHomework(userId, courseId, hw.name, hw.description, hw.startDate, hw.deadlineDate)
-    } ~ (pathPrefixId[Homework] & pathEnd & delete) { homeworkId =>
-      deleteHomework(userId, courseId, homeworkId)
-    } ~ (pathPrefixId[Homework] & pathEnd & put & patch & entity(as[HomeworkRequest])) { (homeworkId, hw) =>
-        editHomework(userId, courseId, homeworkId, hw.name, hw.description, hw.startDate, hw.deadlineDate)
+    pathEndOrSingleSlash {
+      get {
+        listCourseHomeworks(userId, courseId)
+      } ~ (post & entity(as[HomeworkEntity])) { entity =>
+        checkAccess(userId, courseId) { createHomework(courseId, entity) }
+      }
+    } ~ (pathPrefixId[Homework] & pathEnd) { materialId =>
+      (put & entity(as[HomeworkEntity])) { entity =>
+        checkAccess(userId, courseId) { editHomework(materialId, entity) }
+      } ~ delete {
+        checkAccess(userId, courseId) { deleteHomework(materialId) }
+      }
     }
   }
 
+  def listCourseHomeworks(userId: Id[User], courseId: Id[Course]): Future[Seq[Homework]] =
+    accessRepo.isCourseTeacher(userId, courseId).flatMap {
+      case true => homeworkRepo.listAll(courseId)
+      case false => homeworkRepo.listAvailable(courseId)
+    }
 
-  def listHomeworksOfCourse(userId: Id[User], courseId: Id[Course]): Future[Seq[Homework]] =
-    for {
-      isStudent <- accessRepo.isCourseStudent(userId, courseId)
-      isTeacher <- accessRepo.isCourseTeacher(userId, courseId)
-      homeworks <-
-        if (isStudent){
-          homeworkRepo.listOpened(courseId)
-        } else if (isTeacher) {
-          homeworkRepo.listAll(courseId)
-        } else {
-          ApiError(403, "User is not student or teacher of the course")
-        }
-    } yield homeworks
+  def createHomework(courseId: Id[Course], entity: HomeworkEntity): Future[Id[Homework]] =
+    homeworkRepo.add(courseId, entity.name, entity.description, entity.startDate, entity.deadlineDate)
 
+  def editHomework(homeworkId: Id[Homework], entity: HomeworkEntity): Future[Unit] =
+    homeworkRepo.edit(homeworkId, entity.name, entity.description, entity.startDate, entity.deadlineDate)
+      .flatMap(assertSingleUpdate)
 
-  def createNewHomework(userId: Id[User],
-                        courseId: Id[Course],
-                        name: String,
-                        description: String,
-                        startDate: Timestamp,
-                        deadlineDate: Timestamp): Future[Id[Homework]] =
-    for {
-      canManage <- canManageHomeworks(userId, courseId)
-      newHomeworkId <-
-        if (canManage) {
-          homeworkRepo.add(courseId, name, description, startDate, deadlineDate)
-        } else {
-          ApiError(403, "User is not a teacher of the course.")
-        }
-    } yield newHomeworkId
-
-
-  def editHomework(userId: Id[User],
-                   courseId: Id[Course],
-                   homeworkId: Id[Homework],
-                   name: String,
-                   description: String,
-                   startDate: Timestamp,
-                   deadlineDate: Timestamp): Future[Homework] =
-    for {
-      canManage <- canManageHomeworks(userId, courseId)
-      editedHomework <-
-        if (canManage) {
-          homeworkRepo.edit(homeworkId, name, description, startDate, deadlineDate).flatMap{
-            case Some(hw) => Future.successful(hw)
-            case None => ApiError(404, s"Homework with id=${homeworkId.value} doesn't exist.")
-          }
-        } else {
-          ApiError(403, "User is not a teacher of the course.")
-        }
-    } yield editedHomework
-
-
-  def deleteHomework(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework]): Future[Seq[Homework]] =
-    for {
-      canManage <- canManageHomeworks(userId, courseId)
-      rest <-
-        if (canManage) {
-          homeworkRepo.delete(courseId, homeworkId)
-        } else {
-          ApiError(403, "User is not a teacher of the course")
-        }
-    } yield rest
+  def deleteHomework(homeworkId: Id[Homework]): Future[Unit] =
+    homeworkRepo.delete(homeworkId)
+      .flatMap(assertSingleUpdate)
 
   private def canManageHomeworks(userId: Id[User], courseId: Id[Course]): Future[Boolean] =
     accessRepo.isCourseTeacher(userId, courseId)
 
+  private def checkAccess[T](userId: Id[User], courseId: Id[Course]): (=> Future[T]) => Future[T] =
+    checkCondition(ApiError(403, "not permitted to manage homeworks")) {
+      canManageHomeworks(userId, courseId)
+    }
 }
 
 object HomeworkController {
-  case class HomeworkRequest(name: String,
-                             description: String,
-                             startDate: Timestamp,
-                             deadlineDate: Timestamp)
+  case class HomeworkEntity(name: String,
+                            description: String,
+                            startDate: Timestamp,
+                            deadlineDate: Timestamp)
 
-  object HomeworkRequest extends PlayJsonSupport {
+  object HomeworkEntity extends PlayJsonSupport {
     implicit val timestampFormat: Format[Timestamp] = new Format[Timestamp] {
       def writes(t: Timestamp): JsValue = toJson(t.toLocalDateTime)
       def reads(json: JsValue): JsResult[Timestamp] = fromJson[LocalDateTime](json).map(Timestamp.valueOf)
     }
-    implicit val homeworkRequestFormat: Format[HomeworkRequest] = Json.format[HomeworkRequest]
+    implicit val homeworkEntityFormat: Format[HomeworkEntity] = Json.format[HomeworkEntity]
   }
 }
