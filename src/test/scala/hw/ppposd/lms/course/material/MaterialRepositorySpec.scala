@@ -11,13 +11,13 @@ class MaterialRepositorySpec extends DatabaseSpecBase{
   "find" should "return a material with a given id" in new TestWiring {
     private val materialToFind = testData.materials(3)
     whenReady(repo.find(materialToFind.materialId)){
-      _ should be (Some(materialToFind))
+      _ shouldBe Some(materialToFind)
     }
   }
 
   "list" should "return all materials for the course" in new TestWiring {
     whenReady(repo.list(testData.courses(0).id)) {
-      _.toList should be (testData.materials.slice(0, 2))
+      _.toList shouldBe testData.materials.slice(0, 2)
     }
   }
 
@@ -28,13 +28,13 @@ class MaterialRepositorySpec extends DatabaseSpecBase{
 
     whenReady(repo.add(testData.courses(0).id, newName, newDescription)) { newId =>
       whenReady(repo.find(newId)) { newMaterialOption =>
-        newMaterialOption.isDefined should be (true)
+        newMaterialOption.isDefined shouldBe true
         val newMaterial = newMaterialOption.get
-        newMaterial.name should be (newName)
-        newMaterial.description should be (newDescription)
+        newMaterial.name shouldBe newName
+        newMaterial.description shouldBe newDescription
         val now = Timestamp.valueOf(LocalDateTime.now)
-        now.after(newMaterial.creationDate) should be (true)
-        before.before(newMaterial.creationDate) should be (true)
+        now.after(newMaterial.creationDate) shouldBe true
+        before.before(newMaterial.creationDate) shouldBe true
       }
     }
   }
@@ -45,9 +45,9 @@ class MaterialRepositorySpec extends DatabaseSpecBase{
     private val materialEdited = materialToEdit.copy(description = newDescription)
 
     whenReady(repo.edit(materialToEdit.materialId, materialToEdit.name, newDescription)) { rowsChanged =>
-      rowsChanged should be (1)
+      rowsChanged shouldBe 1
       whenReady(repo.find(materialToEdit.materialId)) {
-        _ should be (Some(materialEdited))
+        _ shouldBe Some(materialEdited)
       }
     }
   }
@@ -57,9 +57,9 @@ class MaterialRepositorySpec extends DatabaseSpecBase{
     private val materialToEdit = testData.materials(1)
 
     whenReady(repo.delete(materialToEdit.materialId)) { rowsChanged =>
-      rowsChanged should be (1)
+      rowsChanged shouldBe 1
       whenReady(repo.edit(materialToEdit.materialId, materialToEdit.name, newDescription)) { rowsChanged =>
-        rowsChanged should be (0)
+        rowsChanged shouldBe 0
       }
     }
   }
@@ -67,9 +67,9 @@ class MaterialRepositorySpec extends DatabaseSpecBase{
   "delete" should "delete the material with a given id" in new TestWiring {
     private val materialToDelete = testData.materials(4)
     whenReady(repo.delete(materialToDelete.materialId)) { rowsChanged =>
-      rowsChanged should be (1)
+      rowsChanged shouldBe 1
       whenReady(repo.list(materialToDelete.courseId)) {
-        _.toList should be (testData.materials.slice(2, 4))
+        _.toList shouldBe testData.materials.slice(2, 4)
       }
     }
   }

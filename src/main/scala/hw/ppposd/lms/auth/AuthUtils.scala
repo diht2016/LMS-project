@@ -23,7 +23,7 @@ object AuthUtils {
   }
 
   def isEmailValid(email: String): Boolean = {
-    email.matches("^\\S+@\\S+.\\S+$")
+    email.matches("^\\S+@\\S+\\.\\S+$")
   }
 
   def randomSession: String = randomString(64)

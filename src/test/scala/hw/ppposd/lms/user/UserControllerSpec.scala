@@ -23,8 +23,8 @@ class UserControllerSpec extends RouteSpecBase {
       Future.successful(Some(sampleGroup))
 
     Get("/me") ~> controller.route(sampleStudentId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleStudentResponseFull)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleStudentResponseFull
     }
   }
 
@@ -37,8 +37,8 @@ class UserControllerSpec extends RouteSpecBase {
     (groupRepoMock.find _ expects *).never()
 
     Get("/me") ~> controller.route(sampleTeacherId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleTeacherResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleTeacherResponse
     }
   }
 
@@ -53,9 +53,9 @@ class UserControllerSpec extends RouteSpecBase {
       Future.successful(Some(sampleGroup))
 
     Get(s"/${sampleStudentId.value}") ~> controller.route(sampleObserverId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleStudentResponseHidden)
-      sampleStudentResponseHidden should be (sampleStudentResponseHiddenOtherWay)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleStudentResponseHidden
+      sampleStudentResponseHidden shouldBe sampleStudentResponseHiddenOtherWay
     }
   }
 
@@ -68,8 +68,8 @@ class UserControllerSpec extends RouteSpecBase {
     (groupRepoMock.find _ expects *).never()
 
     Get(s"/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleTeacherResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleTeacherResponse
     }
   }
 
@@ -81,8 +81,8 @@ class UserControllerSpec extends RouteSpecBase {
       s"""{"error":"user not found"}"""
 
     Get(s"/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
-      status should be (StatusCodes.NotFound)
-      responseAs[String] should be (sampleResponse)
+      status shouldBe StatusCodes.NotFound
+      responseAs[String] shouldBe sampleResponse
     }
   }
 
@@ -92,8 +92,8 @@ class UserControllerSpec extends RouteSpecBase {
 
     PatchJson("/me/personal", samplePersonalDataEntity) ~>
       controller.route(sampleTeacherId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -103,8 +103,8 @@ class UserControllerSpec extends RouteSpecBase {
 
     PatchJson("/me/personal", samplePersonalDataEntityEmpty) ~>
       controller.route(sampleTeacherId) ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -116,14 +116,14 @@ class UserControllerSpec extends RouteSpecBase {
 
     PatchJson("/me/personal", samplePersonalDataEntity.copy(phoneNumber = Some("123"))) ~>
       controller.route(sampleTeacherId) ~> check {
-      status should be (StatusCodes.BadRequest)
-      responseAs[String] should be (errorResponse("invalid phone number"))
+      status shouldBe StatusCodes.BadRequest
+      responseAs[String] shouldBe errorResponse("invalid phone number")
     }
 
     PatchJson("/me/personal", samplePersonalDataEntity.copy(vk = Some("https://example.com/test"))) ~>
       controller.route(sampleTeacherId) ~> check {
-      status should be (StatusCodes.BadRequest)
-      responseAs[String] should be (errorResponse("invalid vk link"))
+      status shouldBe StatusCodes.BadRequest
+      responseAs[String] shouldBe errorResponse("invalid vk link")
     }
   }
 

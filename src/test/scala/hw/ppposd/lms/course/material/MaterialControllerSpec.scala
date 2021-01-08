@@ -17,8 +17,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(sampleMaterials)
 
     Get() ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleListResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleListResponse
     }
   }
 
@@ -31,8 +31,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     PostJson("/", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleMaterialId.toString)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleMaterialId.toString
     }
   }
 
@@ -45,8 +45,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(true)
 
     PostJson("/", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleMaterialId.toString)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleMaterialId.toString
     }
   }
 
@@ -57,8 +57,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     PostJson("/", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.Forbidden)
-      responseAs[String] should be (errorResponse)
+      status shouldBe StatusCodes.Forbidden
+      responseAs[String] shouldBe errorResponse
     }
   }
 
@@ -71,8 +71,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -85,8 +85,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(true)
 
     PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -97,8 +97,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
-      status should be (StatusCodes.Forbidden)
-      responseAs[String] should be (errorResponse)
+      status shouldBe StatusCodes.Forbidden
+      responseAs[String] shouldBe errorResponse
     }
   }
 
@@ -111,8 +111,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     Delete(s"/$sampleMaterialId") ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -125,8 +125,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(true)
 
     Delete(s"/$sampleMaterialId") ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (okResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe okResponse
     }
   }
 
@@ -137,8 +137,8 @@ class MaterialControllerSpec extends RouteSpecBase {
       Future.successful(false)
 
     Delete(s"/$sampleMaterialId") ~> route ~> check {
-      status should be (StatusCodes.Forbidden)
-      responseAs[String] should be (errorResponse)
+      status shouldBe StatusCodes.Forbidden
+      responseAs[String] shouldBe errorResponse
     }
   }
 

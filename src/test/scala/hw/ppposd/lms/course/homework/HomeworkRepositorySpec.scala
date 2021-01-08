@@ -10,19 +10,19 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
 
   "find" should "find a homework with a given id" in new TestWiring {
     whenReady(repo.find(testData.homeworks(2).homeworkId)) {
-      _ should be (Some(testData.homeworks(2)))
+      _ shouldBe Some(testData.homeworks(2))
     }
   }
 
   "listAll" should "return all homeworks for the course" in new TestWiring {
     whenReady(repo.listAll(testData.courses(0).id)) {
-      _.toList should be (testData.homeworks.slice(0, 3))
+      _.toList shouldBe testData.homeworks.slice(0, 3)
     }
   }
 
   "listAvailable" should "return homeworks with startDate not greater than current date" in new TestWiring {
     whenReady(repo.listAvailable(testData.courses(1).id)) {
-      _.toList should be (List(testData.homeworks(5)))
+      _.toList shouldBe List(testData.homeworks(5))
     }
   }
 
@@ -36,7 +36,7 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
     whenReady(repo.add(hw.courseId, hw.name, hw.description, hw.startDate, hw.deadlineDate)) { newId =>
       val newHw = hw.copy(homeworkId = newId)
       whenReady(repo.find(newId)) { res =>
-        res should be (Some(newHw))
+        res shouldBe Some(newHw)
       }
     }
   }
@@ -47,9 +47,9 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
     val hwToEdit = testData.homeworks(5)
     val hwEdited = hwToEdit.copy(startDate = newStartDate, deadlineDate = newDeadlineDate)
     whenReady(repo.edit(hwToEdit.homeworkId, hwToEdit.name, hwToEdit.description, newStartDate, newDeadlineDate)) { rowsChanged =>
-      rowsChanged should be (1)
+      rowsChanged shouldBe 1
       whenReady(repo.find(hwToEdit.homeworkId)) {
-        _ should be (Some(hwEdited))
+        _ shouldBe Some(hwEdited)
       }
     }
   }
@@ -57,9 +57,9 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
   "delete" should "drop the homework with a given id" in new TestWiring {
     private val homeworkToDelete = testData.homeworks(3)
     whenReady(repo.delete(homeworkToDelete.homeworkId)) { rowsChanged =>
-      rowsChanged should be (1)
+      rowsChanged shouldBe 1
       whenReady(repo.listAll(homeworkToDelete.courseId)) {
-        _.toList should be (testData.homeworks.slice(4, 6))
+        _.toList shouldBe testData.homeworks.slice(4, 6)
       }
     }
   }

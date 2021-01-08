@@ -24,8 +24,8 @@ class CourseControllerSpec extends RouteSpecBase {
       s"""[{"id":${sampleCourseId.value},"name":"test course","description":"sample desc"}]"""
 
     Get() ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleResponse
     }
   }
 
@@ -37,8 +37,8 @@ class CourseControllerSpec extends RouteSpecBase {
       s"""{"id":${sampleCourseId.value},"name":"test course","description":"sample desc"}"""
 
     Get(s"/${sampleCourseId.value}") ~> route ~> check {
-      status should be (StatusCodes.OK)
-      responseAs[String] should be (sampleResponse)
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldBe sampleResponse
     }
   }
 
@@ -50,8 +50,8 @@ class CourseControllerSpec extends RouteSpecBase {
       s"""{"error":"course not found"}"""
 
     Get(s"/${sampleCourseId.value}") ~> route ~> check {
-      status should be (StatusCodes.NotFound)
-      responseAs[String] should be (sampleResponse)
+      status shouldBe StatusCodes.NotFound
+      responseAs[String] shouldBe sampleResponse
     }
   }
 

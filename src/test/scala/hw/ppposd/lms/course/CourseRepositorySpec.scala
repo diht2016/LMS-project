@@ -12,21 +12,21 @@ class CourseRepositorySpec extends DatabaseSpecBase {
     whenReady(repo.create(newCourse.name, newCourse.description)) { newId =>
       val newCourseWithId = newCourse.copy(id = newId)
       whenReady(repo.find(newId)) {
-        _ should be (Some(newCourseWithId))
+        _ shouldBe Some(newCourseWithId)
       }
     }
   }
 
   "list" should "return all courses" in new TestWiring {
     whenReady(repo.list()) {
-      _.toList should be (testData.courses)
+      _.toList shouldBe testData.courses
     }
   }
 
   "find" should "return existing course" in new TestWiring {
     val course = testData.courses.last
     whenReady(repo.find(course.id)) {
-      _ should be (Some(course))
+      _ shouldBe Some(course)
     }
   }
 

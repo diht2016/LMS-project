@@ -6,7 +6,7 @@ import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Format, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,9 +38,9 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
     headerValueByName(sessionHeaderName) { session =>
       onSuccess(authRepo.findUserIdBySession(session)) {
         case Some(userId) => innerRoute(userId)
-        case None => complete(401, "invalid session")
+        case None => ApiError(401, "invalid session")
       }
-    }
+    } ~ ApiError(401, "session header is not provided")
 
   private def login(entity: LoginEntity): Future[String] = {
     val passwordHash = hashPassword(entity.password)
@@ -65,7 +65,7 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
             .flatMap(assertSingleUpdate)
             .flatMap(_ => authRepo.destroyVerification(entity.verificationCode))
             .flatMap(assertSingleUpdate)
-        case None => ApiError(401, "verification code is invalid")
+        case None => ApiError(401, "invalid verification code")
       }
     }
   }
@@ -88,11 +88,11 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
 
 object AuthController extends PlayJsonSupport {
   final case class LoginEntity(email: String, password: String)
-  implicit val loginFormat: Reads[LoginEntity] = Json.reads[LoginEntity]
+  implicit val loginFormat: Format[LoginEntity] = Json.format[LoginEntity]
 
   final case class RegisterEntity(verificationCode: String, email: String, password: String)
-  implicit val registerFormat: Reads[RegisterEntity] = Json.reads[RegisterEntity]
+  implicit val registerFormat: Format[RegisterEntity] = Json.format[RegisterEntity]
 
   final case class ChangePasswordEntity(oldPassword: String, newPassword: String)
-  implicit val changePasswordFormat: Reads[ChangePasswordEntity] = Json.reads[ChangePasswordEntity]
+  implicit val changePasswordFormat: Format[ChangePasswordEntity] = Json.format[ChangePasswordEntity]
 }
