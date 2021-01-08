@@ -7,7 +7,6 @@ import slick.jdbc.JdbcBackend.Database
 import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
 object TestDatabase {
@@ -20,7 +19,7 @@ object TestDatabase {
   private def initializeDatabase(): (Database, TestData) = {
     deleteDatabase()
     implicit lazy val db: Database = Database.forConfig("db")
-    Await.ready(Schema.createSchema, 3 seconds)
+    Await.ready(Schema.createSchema, 3.seconds)
     val testData = SampleDatabaseContent.fillDatabase
     saveDatabase()
     (db, testData)

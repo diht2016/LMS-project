@@ -175,6 +175,18 @@ object SampleDatabaseContent {
       materialsFull)
   }
 
+  def truncateTables(implicit db: Database): Unit = {
+    val deleteSchema = Schema.tables.map(_.schema.truncate)
+    val setup = DBIO.sequence(deleteSchema)
+    Await.ready(db.run(setup), 3.seconds)
+  }
+
+  def dropTables(implicit db: Database): Unit = {
+    val deleteSchema = Schema.tables.map(_.schema.dropIfExists)
+    val setup = DBIO.sequence(deleteSchema)
+    Await.ready(db.run(setup), 3.seconds)
+  }
+
   private def insertAndReturnAll[T, Q <: Table[T]]
     (rows: Seq[T], tableQuery: TableQuery[Q])(implicit db: Database): Seq[T] = {
     val action = (tableQuery ++= rows).andThen(tableQuery.result)

@@ -36,22 +36,24 @@ object Schema {
   val courseTutorLinks = TableQuery[CourseTutorTable]
   val groupCourseLinks = TableQuery[GroupCourseTable]
 
+  val tables = List(
+    sessions,
+    verifications,
+    courses,
+    materials,
+    homeworks,
+    solutions,
+    groups,
+    users,
+    personalData,
+    studentData,
+    courseTeacherLinks,
+    courseTutorLinks,
+    groupCourseLinks,
+  )
+
   def createSchema(implicit db: Database): Future[Unit] = {
-    val schema = List(
-      sessions,
-      verifications,
-      courses,
-      materials,
-      homeworks,
-      solutions,
-      groups,
-      users,
-      personalData,
-      studentData,
-      courseTeacherLinks,
-      courseTutorLinks,
-      groupCourseLinks,
-    ).map(_.schema).reduce(_ ++ _)
+    val schema = tables.map(_.schema).reduce(_ ++ _)
 
     val setup = DBIO.seq{schema.createIfNotExists}
     db.run(setup)

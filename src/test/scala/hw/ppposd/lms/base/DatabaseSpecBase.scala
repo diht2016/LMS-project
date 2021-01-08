@@ -1,40 +1,23 @@
 package hw.ppposd.lms.base
 
 import hw.ppposd.lms.TestDatabase
-import org.scalatest.{BeforeAndAfterEach, Canceled, Failed, Outcome, Retries}
-import org.scalatest.time.{Millis, Span}
+import org.scalatest.BeforeAndAfterEach
 import slick.jdbc.JdbcBackend.Database
 
-trait DatabaseSpecBase extends SpecBase with BeforeAndAfterEach with Retries {
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.DurationInt
+
+trait DatabaseSpecBase extends SpecBase with BeforeAndAfterEach {
 
   implicit val db: Database = TestDatabase.db
 
-  implicit val whenReadyConfig: PatienceConfig =
-    PatienceConfig(timeout = Span(1000, Millis))
+  def whenReady[T](future: Future[T])(action: T => Unit): Unit = {
+    action(Await.result(future, 5.seconds))
+  }
 
   override def afterEach(): Unit = {
     Thread.sleep(150) // wait for db connection to close
     TestDatabase.restoreDatabase()
-    Thread.sleep(150) // wait more
-  }
-
-  val retries = 10
-
-  override def withFixture(test: NoArgTest): Outcome = {
-    withFixture(test, retries)
-  }
-
-  def withFixture(test: NoArgTest, count: Int): Outcome = {
-    val outcome = super.withFixture(test)
-    //println(test.name, count, outcome)
-    outcome match {
-      case Failed(_) | Canceled(_) => if (count == 1) {
-        println(count)
-        super.withFixture(test)
-      } else {
-        withFixture(test, count - 1)
-      }
-      case other => other
-    }
+    Thread.sleep(150) // wait for copying to finish
   }
 }
