@@ -16,10 +16,11 @@ object Application extends App {
 
   val route = new RootRouting(new RootWiringImpl).route
 
-  val port = 8080 // todo: move to config
-  val binding = Http().newServerAt("localhost", port).bind(route)
+  val binding = Http()
+    .newServerAt(ApplicationConfig.interface, ApplicationConfig.port)
+    .bind(route)
 
-  println(s"Server running at http://localhost:$port/")
+  println(s"Server running at http://localhost:${ApplicationConfig.port}/")
   println("Press RETURN to stop")
   StdIn.readLine()
   binding.flatMap(_.unbind()).onComplete(_ => system.terminate())
