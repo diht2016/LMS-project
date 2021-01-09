@@ -17,7 +17,7 @@ object TestDatabase {
   private val dbFilePath = s"${testConfig.getString("test.dbFilePath")}.mv.db"
   private val dbBackupFilePath = s"${testConfig.getString("test.dbBackupPath")}.mv.db"
 
-  private def initializeDatabase(): (Database, TestData) = {
+  def initializeDatabase(): (Database, TestData) = {
     deleteDatabase()
     implicit lazy val db: Database = Database.forConfig("test.db")
     Await.ready(Schema.createSchema, 3.seconds)

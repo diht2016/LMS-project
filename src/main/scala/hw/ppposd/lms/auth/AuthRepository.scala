@@ -5,7 +5,7 @@ import hw.ppposd.lms.auth.AuthUtils._
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait AuthRepository {
   def createSession(userId: Id[User]): Future[String]
@@ -22,12 +22,13 @@ trait AuthRepository {
   def setPasswordHash(userId: Id[User], passwordHash: String): Future[Int]
 }
 
-class AuthRepositoryImpl(implicit db: Database) extends AuthRepository {
+class AuthRepositoryImpl(implicit db: Database, ec: ExecutionContext) extends AuthRepository {
   import hw.ppposd.lms.Schema._
 
-  override def createSession(userId: Id[User]): Future[String] =
-    db.run((sessions returning sessions.map(_.session))
-      += Session(randomSession, userId))
+  override def createSession(userId: Id[User]): Future[String] = {
+    val session = Session(randomSession, userId)
+    db.run(sessions += session).map(_ => session.session)
+  }
 
   override def findUserIdBySession(session: String): Future[Option[Id[User]]] =
     db.run(sessions.filter(_.session === session).map(_.userId).result.headOption)

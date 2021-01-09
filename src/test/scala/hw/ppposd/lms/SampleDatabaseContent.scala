@@ -2,6 +2,7 @@ package hw.ppposd.lms
 
 import java.sql.Timestamp
 
+import hw.ppposd.lms.auth.AuthUtils
 import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution
@@ -28,10 +29,10 @@ object SampleDatabaseContent {
   val group1: Group = Group(id(21), "001", "Art and Science", 3)
   val group2: Group = Group(id(22), "002", "Biology", 2)
 
-  val student1: User = User(id(1), "Ivan Kozlov", "i.kozlov@lms.ru", "", Some(id(21)))
-  val student2: User = User(id(2), "Daria Titova", "d.titova@lms.ru", "", Some(id(22)))
-  val teacher1: User = User(id(3), "Alexey Soloviov", "a.soloviov@lms.ru", "", None)
-  val teacher2: User = User(id(4), "Maria Gorbunova", "m.gorbunova@lms.ru", "", None)
+  val student1: User = User(id(1), "Ivan Kozlov", "i.kozlov@lms.ru", AuthUtils.hashPassword("test-student1"), Some(id(21)))
+  val student2: User = User(id(2), "Daria Titova", "d.titova@lms.ru", AuthUtils.hashPassword("test-student2"), Some(id(22)))
+  val teacher1: User = User(id(3), "Alexey Soloviov", "a.soloviov@lms.ru", AuthUtils.hashPassword("test-teacher1"), None)
+  val teacher2: User = User(id(4), "Maria Gorbunova", "m.gorbunova@lms.ru", AuthUtils.hashPassword("test-teacher2"), None)
 
   val personalDataS1: PersonalData = PersonalData(id(1), Some("89999999999"), Some("Voronezh"), None, Some("https://vk.com/ikozlov"), None, None, None)
   val personalDataS2: PersonalData = PersonalData(id(2), Some("87777777777"), Some("Tomsk"), None, None, None, None, Some("https://instagram/_daria_"))

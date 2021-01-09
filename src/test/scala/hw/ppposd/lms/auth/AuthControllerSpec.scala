@@ -2,6 +2,7 @@ package hw.ppposd.lms.auth
 
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.StatusCodes
+import hw.ppposd.lms.auth.AuthController
 import hw.ppposd.lms.base.RouteSpecBase
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
@@ -173,9 +174,9 @@ class AuthControllerSpec extends RouteSpecBase {
 }
 
 object AuthControllerSpec {
-  import hw.ppposd.lms.auth.AuthController._
+  import AuthController._
 
-  private val sessionHeaderName = "Session"
+  private val sessionHeaderName = AuthController.sessionHeaderName
   private val sampleSession = "sample session"
   private val sampleUserId = new Id[User](123)
   private val sessionHeader: RawHeader = RawHeader(sessionHeaderName, sampleSession)

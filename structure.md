@@ -4,8 +4,9 @@
 - Group ({group.id}, name, department, courseNumber)
 - Course ({course.id}, name, description)
 - GroupCourse ({group.id, course.id})
-- Verification ({verificationCode}, fullName)
 - User ({user.id}, fullName, email, password, group.id?)
+- Verification ({verificationCode}, user.id)
+- Session ({session}, user.id)
 - CourseTeacher ({course.id, user#teacher.id})
 - CourseTutor ({course.id, user#student.id})
 - StudentData ({user#student.id}, yearOfEnrollment, degree, studyForm, learningBase)
@@ -13,11 +14,6 @@
 - Material ({material.id}, course.id, name, description, creationDate)
 - Homework ({homework.id}, course.id, name, description, startDate, deadlineDate)
 - Solution ({homework.id, user#student.id}, text, date)
-
-## Enums
-- Degree [Bachelor, Specialist, Master]
-- StudyForm [Intramural, Extramural, Evening]
-- LearningBase [Contract, Budget]
 
 ## Platform actions
 * Admin

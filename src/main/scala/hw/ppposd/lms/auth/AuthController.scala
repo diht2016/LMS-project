@@ -1,7 +1,7 @@
 package hw.ppposd.lms.auth
 
 import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directive1, MissingHeaderRejection, Route}
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
 import hw.ppposd.lms.user.User
@@ -11,7 +11,6 @@ import play.api.libs.json.{Format, Json}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) extends Controller {
-  private val sessionHeaderName = "Session"
   import AuthController._
   import AuthUtils._
 
@@ -35,12 +34,13 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
   )
 
   def userSession(innerRoute: Id[User] => Route): Route =
-    headerValueByName(sessionHeaderName) { session =>
-      onSuccess(authRepo.findUserIdBySession(session)) {
+    optionalHeaderValueByName(sessionHeaderName) {
+      case Some(session) => onSuccess(authRepo.findUserIdBySession(session)) {
         case Some(userId) => innerRoute(userId)
         case None => ApiError(401, "invalid session")
       }
-    } ~ ApiError(401, "session header is not provided")
+      case None => ApiError(401, "session header is not provided")
+    }
 
   private def login(entity: LoginEntity): Future[String] = {
     val passwordHash = hashPassword(entity.password)
@@ -87,6 +87,8 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
 }
 
 object AuthController extends PlayJsonSupport {
+  val sessionHeaderName = "session"
+
   final case class LoginEntity(email: String, password: String)
   implicit val loginFormat: Format[LoginEntity] = Json.format[LoginEntity]
 
