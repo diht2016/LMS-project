@@ -4,18 +4,19 @@ import hw.ppposd.lms.course.homework.{HomeworkController, HomeworkRepositoryImpl
 import hw.ppposd.lms.course.material.{MaterialController, MaterialRepositoryImpl}
 import hw.ppposd.lms.course.teacher.{TeacherController, TeacherRepositoryImpl}
 import hw.ppposd.lms.course.tutor.{TutorController, TutorRepositoryImpl}
+import hw.ppposd.lms.user.UserCommons
 import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.ExecutionContext
 
 trait CourseWiring {
-  val teacherController: TeacherController
-  val tutorController: TutorController
-  val materialController: MaterialController
-  val homeworkController: HomeworkController
+  def teacherController: TeacherController
+  def tutorController: TutorController
+  def materialController: MaterialController
+  def homeworkController: HomeworkController
 }
 
-class CourseWiringImpl(accessRepo: AccessRepository)
+class CourseWiringImpl(accessRepo: AccessRepository, userCommons: UserCommons)
                       (implicit db: Database, ec: ExecutionContext) extends CourseWiring {
   private val homeworkRepo = new HomeworkRepositoryImpl
   //private val solutionRepo = new SolutionRepositoryImpl
@@ -23,9 +24,9 @@ class CourseWiringImpl(accessRepo: AccessRepository)
   private val teacherRepo = new TeacherRepositoryImpl
   private val tutorRepo = new TutorRepositoryImpl
 
-  val homeworkController = new HomeworkController(homeworkRepo, accessRepo)
-  //val solutionController = new SolutionController
-  val materialController = new MaterialController(materialRepo, accessRepo)
-  override val teacherController = new TeacherController(teacherRepo, accessRepo)
-  override val tutorController = new TutorController(tutorRepo, accessRepo)
+  override val homeworkController = new HomeworkController(homeworkRepo, accessRepo)
+  //override val solutionController = new SolutionController
+  override val materialController = new MaterialController(materialRepo, accessRepo)
+  override val teacherController = new TeacherController(teacherRepo, userCommons)
+  override val tutorController = new TutorController(tutorRepo, accessRepo, userCommons)
 }
