@@ -3,18 +3,15 @@ package hw.ppposd.lms.course.homework
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-import akka.http.scaladsl.model.DateTime
 import akka.http.scaladsl.server.Route
-import com.fasterxml.jackson.core.JsonParseException
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
 import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.user.User
-import hw.ppposd.lms.util.FutureUtils.failOnFalseWith
 import hw.ppposd.lms.util.Id
 import play.api.libs.json.Json.{fromJson, toJson}
-import play.api.libs.json.{Format, JsResult, JsString, JsValue, Json, Writes}
+import play.api.libs.json.{Format, JsResult, JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,10 +68,8 @@ object HomeworkController {
                             deadlineDate: Timestamp)
 
   object HomeworkEntity extends PlayJsonSupport {
-    implicit val timestampFormat: Format[Timestamp] = new Format[Timestamp] {
-      def writes(t: Timestamp): JsValue = toJson(t.toLocalDateTime)
-      def reads(json: JsValue): JsResult[Timestamp] = fromJson[LocalDateTime](json).map(Timestamp.valueOf)
-    }
+    import hw.ppposd.lms.util.JsonUtils.timestampFormat
+
     implicit val homeworkEntityFormat: Format[HomeworkEntity] = Json.format[HomeworkEntity]
   }
 }
