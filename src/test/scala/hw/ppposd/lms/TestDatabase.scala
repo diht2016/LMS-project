@@ -18,9 +18,10 @@ object TestDatabase {
   private val dbBackupFilePath = s"${testConfig.getString("test.dbBackupPath")}.mv.db"
 
   def initializeDatabase(): (Database, TestData) = {
+    Thread.sleep(150) // wait for file to become unoccupied
     deleteDatabase()
     implicit lazy val db: Database = Database.forConfig("test.db")
-    Await.ready(Schema.createSchema, 3.seconds)
+    Schema.createSchema()
     val testData = SampleDatabaseContent.fillDatabase
     saveDatabase()
     (db, testData)
@@ -34,8 +35,10 @@ object TestDatabase {
 
   @tailrec
   private def copyFile(src: String, dst: String): Unit = {
+    Thread.sleep(150) // wait for db connection to close
     Try {
       Files.copy(Paths.get(src), Paths.get(dst), StandardCopyOption.REPLACE_EXISTING)
+      Thread.sleep(150) // wait for copying to finish
     } match {
       case Failure(_) =>
         // file is occupied, wait and retry

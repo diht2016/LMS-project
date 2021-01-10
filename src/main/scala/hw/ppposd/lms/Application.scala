@@ -12,7 +12,7 @@ object Application extends App {
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val db: Database = Database.forConfig("db")
 
-  Schema.createSchema(db)
+  Schema.createSchema()
 
   val route = new RootRouting(new RootWiringImpl).route
 
@@ -24,4 +24,5 @@ object Application extends App {
   println("Press RETURN to stop")
   StdIn.readLine()
   binding.flatMap(_.unbind()).onComplete(_ => system.terminate())
+  db.close()
 }

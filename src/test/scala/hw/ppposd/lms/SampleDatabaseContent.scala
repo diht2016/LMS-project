@@ -47,44 +47,44 @@ object SampleDatabaseContent {
     id(11),
     "Matrices",
     "Ex 1-10",
-    Timestamp.valueOf("2021-1-1 10:00:00"),
-    Timestamp.valueOf("2021-1-7 00:00:00"))
+    Timestamp.valueOf("2021-01-01 10:00:00"),
+    Timestamp.valueOf("2021-01-07 23:59:59"))
 
   val homeworkAlgebra2: Homework = Homework(
     id(82),
     id(11),
     "Groups",
     "Ex 1-10",
-    Timestamp.valueOf("2020-12-1 10:00:00"),
-    Timestamp.valueOf("2020-12-7 00:00:00"))
+    Timestamp.valueOf("2020-12-01 10:00:00"),
+    Timestamp.valueOf("2020-12-07 23:59:59"))
   val homeworkAlgebra3: Homework = Homework(
     id(83),
     id(11),
     "Rotations",
     "Ex 1-10",
-    Timestamp.valueOf("2020-12-8 10:00:00"),
-    Timestamp.valueOf("2020-12-14 00:00:00"))
+    Timestamp.valueOf("2020-12-08 10:00:00"),
+    Timestamp.valueOf("2020-12-14 23:59:59"))
   val homeworkPhilosophy1: Homework = Homework(
     id(84),
     id(12),
     "R.Descartes",
     "Make a report",
-    Timestamp.valueOf("2021-2-1 10:00:00"),
-    Timestamp.valueOf("2021-2-7 00:00:00"))
+    Timestamp.valueOf("2021-02-01 10:00:00"),
+    Timestamp.valueOf("2021-02-07 23:59:59"))
   val homeworkPhilosophy2: Homework = Homework(
     id(85),
     id(12),
     "Spinoza",
     "Make a report",
-    Timestamp.valueOf("2021-2-8 10:00:00"),
-    Timestamp.valueOf("2021-2-14 00:00:00"))
+    Timestamp.valueOf("2021-02-08 10:00:00"),
+    Timestamp.valueOf("2021-02-14 23:59:59"))
   val homeworkPhilosophy3: Homework = Homework(
     id(86),
     id(12),
     "I.Kant",
     "Make a report",
     Timestamp.valueOf("2020-12-14 10:00:00"),
-    Timestamp.valueOf("2020-12-11 00:00:00"))
+    Timestamp.valueOf("2020-12-19 23:59:59"))
 
   val solutionAlgebraSt1: Solution = Solution(id(81), id(1), "Some text", Timestamp.valueOf("2021-01-03 12:30:00"))
   val solutionPhilosophySt2: Solution = Solution(id(82), id(2), "Some text", Timestamp.valueOf("2020-12-10 13:30:00"))
@@ -179,23 +179,24 @@ object SampleDatabaseContent {
   def truncateTables(implicit db: Database): Unit = {
     val deleteSchema = Schema.tables.map(_.schema.truncate)
     val setup = DBIO.sequence(deleteSchema)
-    Await.ready(db.run(setup), 3.seconds)
+    Await.ready(db.run(setup), 5.seconds)
   }
 
   def dropTables(implicit db: Database): Unit = {
     val deleteSchema = Schema.tables.map(_.schema.dropIfExists)
     val setup = DBIO.sequence(deleteSchema)
-    Await.ready(db.run(setup), 3.seconds)
+    Await.ready(db.run(setup), 5.seconds)
   }
 
-  private def insertAndReturnAll[T, Q <: Table[T]]
-    (rows: Seq[T], tableQuery: TableQuery[Q])(implicit db: Database): Seq[T] = {
+  private def insertAndReturnAll[T, E <: Table[T]]
+      (rows: Seq[T], tableQuery: TableQuery[E])(implicit db: Database): Seq[T] = {
     val action = (tableQuery ++= rows).andThen(tableQuery.result)
-    Await.result(db.run(action), 3.seconds)
+    Await.result(db.run(action), 5.seconds)
   }
 
-  private def insertRows[T, E <: Table[T]](rows: Seq[T], tableQuery: TableQuery[E])(implicit db: Database): Unit = {
-    Await.result(db.run(DBIO.seq(tableQuery ++= rows)), 3.seconds)
+  private def insertRows[T, E <: Table[T]]
+      (rows: Seq[T], tableQuery: TableQuery[E])(implicit db: Database): Unit = {
+    Await.result(db.run(DBIO.seq(tableQuery ++= rows)), 5.seconds)
   }
 
   private def id[T](v: Long): Id[T] = new Id[T](v)

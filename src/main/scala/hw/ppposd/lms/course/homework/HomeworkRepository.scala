@@ -1,7 +1,6 @@
 package hw.ppposd.lms.course.homework
 
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 import hw.ppposd.lms.Schema._
 import hw.ppposd.lms.course.Course
@@ -10,10 +9,9 @@ import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.Future
 
-
 trait HomeworkRepository {
-  def listAll(courseId: Id[Course]): Future[Seq[Homework]]
-  def listAvailable(courseId: Id[Course]): Future[Seq[Homework]]
+  def list(courseId: Id[Course]): Future[Seq[Homework]]
+  def listStarted(courseId: Id[Course], now: Timestamp): Future[Seq[Homework]]
   def add(courseId: Id[Course],
           name: String,
           description: String,
@@ -30,11 +28,10 @@ trait HomeworkRepository {
 
 class HomeworkRepositoryImpl(implicit db: Database) extends HomeworkRepository {
 
-  override def listAll(courseId: Id[Course]): Future[Seq[Homework]] =
+  override def list(courseId: Id[Course]): Future[Seq[Homework]] =
     db.run(homeworks.filter(_.courseId === courseId).result)
 
-  override def listAvailable(courseId: Id[Course]): Future[Seq[Homework]] = {
-    val now = Timestamp.valueOf(LocalDateTime.now)
+  override def listStarted(courseId: Id[Course], now: Timestamp): Future[Seq[Homework]] = {
     db.run(homeworks.filter(hw => hw.courseId === courseId && hw.startDate <= now).result)
   }
 

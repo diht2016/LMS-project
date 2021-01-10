@@ -3,18 +3,15 @@ package hw.ppposd.lms.course.homework
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-import akka.http.scaladsl.model.DateTime
 import akka.http.scaladsl.server.Route
-import com.fasterxml.jackson.core.JsonParseException
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
 import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.user.User
-import hw.ppposd.lms.util.FutureUtils.failOnFalseWith
 import hw.ppposd.lms.util.Id
 import play.api.libs.json.Json.{fromJson, toJson}
-import play.api.libs.json.{Format, JsResult, JsString, JsValue, Json, Writes}
+import play.api.libs.json.{Format, JsResult, JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,8 +37,8 @@ class HomeworkController(homeworkRepo: HomeworkRepository,
 
   def listCourseHomeworks(userId: Id[User], courseId: Id[Course]): Future[Seq[Homework]] =
     accessRepo.isCourseTeacher(userId, courseId).flatMap {
-      case true => homeworkRepo.listAll(courseId)
-      case false => homeworkRepo.listAvailable(courseId)
+      case true => homeworkRepo.list(courseId)
+      case false => homeworkRepo.listStarted(courseId, Timestamp.valueOf(LocalDateTime.now))
     }
 
   def createHomework(courseId: Id[Course], entity: HomeworkEntity): Future[Id[Homework]] =

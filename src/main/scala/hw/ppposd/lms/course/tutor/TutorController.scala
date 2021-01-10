@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TutorController(tutorRepo: TutorRepository, accessRepo: AccessRepository, userCommons: UserCommons)
                      (implicit ec: ExecutionContext) extends Controller {
   def route(userId: Id[User], courseId: Id[Course]): Route = {
-    (pathEnd & get) {
+    (pathEndOrSingleSlash & get) {
       listCourseTutorBriefs(courseId)
     } ~ (pathPrefixId[User] & pathEnd & post) { otherUserId =>
       assertCanManageTutors(userId, courseId, otherUserId)
@@ -38,7 +38,7 @@ class TutorController(tutorRepo: TutorRepository, accessRepo: AccessRepository, 
     val userIsCourseTeacher = accessRepo.isCourseTeacher(userId, courseId)
     val tutorIsCourseStudent = accessRepo.isCourseStudent(tutorId, courseId)
     Future.unit
-      .flatMap(assertTrue(userIsCourseTeacher, ApiError(403, "unauthorized to manage tutors")))
-      .flatMap(assertTrue(tutorIsCourseStudent, ApiError(404, "user is not a course student")))
+      .flatMap(assertTrue(userIsCourseTeacher, ApiError(403, "not permitted to manage tutors")))
+      .flatMap(assertTrue(tutorIsCourseStudent, ApiError(400, "user is not a course student")))
   }
 }

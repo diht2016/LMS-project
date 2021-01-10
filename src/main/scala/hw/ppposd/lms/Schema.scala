@@ -15,7 +15,8 @@ import slick.dbio.DBIO
 import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.H2Profile.api._
 
-import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 object Schema {
   /**
@@ -52,10 +53,10 @@ object Schema {
     groupCourseLinks,
   )
 
-  def createSchema(implicit db: Database): Future[Unit] = {
+  def createSchema()(implicit db: Database): Unit = {
     val schema = tables.map(_.schema).reduce(_ ++ _)
 
-    val setup = DBIO.seq{schema.createIfNotExists}
-    db.run(setup)
+    val setup = DBIO.seq(schema.createIfNotExists)
+    Await.ready(db.run(setup), 5.seconds)
   }
 }

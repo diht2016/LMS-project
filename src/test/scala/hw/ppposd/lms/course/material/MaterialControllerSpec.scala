@@ -22,7 +22,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "create new material if user is a teacher" in new TestWiring {
+  it should "create new material if user is a course teacher" in new TestWiring {
     (materialRepoMock.add _).expects (sampleCourseId, sampleMaterial.name, sampleMaterial.description) returns
       Future.successful(sampleMaterialId)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
@@ -36,7 +36,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "create new material if user is a tutor" in new TestWiring {
+  it should "create new material if user is a course tutor" in new TestWiring {
     (materialRepoMock.add _).expects (sampleCourseId, sampleMaterial.name, sampleMaterial.description) returns
       Future.successful(sampleMaterialId)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
@@ -62,7 +62,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "edit material if user is a teacher" in new TestWiring {
+  it should "edit material if user is a course teacher" in new TestWiring {
     (materialRepoMock.edit _).expects (sampleMaterialId, sampleMaterial.name, sampleMaterial.description) returns
       Future.successful(1)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
@@ -76,7 +76,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "edit material if user is a tutor" in new TestWiring {
+  it should "edit material if user is a course tutor" in new TestWiring {
     (materialRepoMock.edit _).expects (sampleMaterialId, sampleMaterial.name, sampleMaterial.description) returns
       Future.successful(1)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
@@ -102,7 +102,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "delete material if user is a teacher" in new TestWiring {
+  it should "delete material if user is a course teacher" in new TestWiring {
     (materialRepoMock.delete _).expects (sampleMaterialId) returns
       Future.successful(1)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
@@ -116,7 +116,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     }
   }
 
-  it should "delete material if user is a tutor" in new TestWiring {
+  it should "delete material if user is a course tutor" in new TestWiring {
     (materialRepoMock.delete _).expects (sampleMaterialId) returns
       Future.successful(1)
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns

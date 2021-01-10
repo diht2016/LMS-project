@@ -1,6 +1,7 @@
 package hw.ppposd.lms.course.homework
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 import hw.ppposd.lms.TestDatabase.testData
 import hw.ppposd.lms.base.DatabaseSpecBase
@@ -14,24 +15,25 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
     }
   }
 
-  "listAll" should "return all homeworks for the course" in new TestWiring {
-    whenReady(repo.listAll(testData.courses(0).id)) {
+  "list" should "return all homeworks for the course" in new TestWiring {
+    whenReady(repo.list(testData.courses(0).id)) {
       _.toList shouldBe testData.homeworks.slice(0, 3)
     }
   }
 
-  "listAvailable" should "return homeworks with startDate not greater than current date" in new TestWiring {
-    whenReady(repo.listAvailable(testData.courses(1).id)) {
+  "listStarted" should "return homeworks with startDate not greater than current date" in new TestWiring {
+    private val now = Timestamp.valueOf("2021-01-05 11:00:00")
+    whenReady(repo.listStarted(testData.courses(1).id, now)) {
       _.toList shouldBe List(testData.homeworks(5))
     }
   }
 
   "add" should "create a new homework" in new TestWiring {
-    val hw = Homework(Id.auto,
+    private val hw = Homework(Id.auto,
       testData.courses(1).id,
       "Z.Freud", "Make a report",
-      Timestamp.valueOf("2020-11-1 10:00:00"),
-      Timestamp.valueOf("2020-11-7 10:00:00"))
+      Timestamp.valueOf("2020-11-01 10:00:00"),
+      Timestamp.valueOf("2020-11-07 10:00:00"))
 
     whenReady(repo.add(hw.courseId, hw.name, hw.description, hw.startDate, hw.deadlineDate)) { newId =>
       val newHw = hw.copy(homeworkId = newId)
@@ -42,10 +44,10 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
   }
 
   "edit" should "update fields of a homework if it exists" in new TestWiring {
-    val newStartDate = Timestamp.valueOf("2020-12-1 10:00:00")
-    val newDeadlineDate = Timestamp.valueOf("2020-11-21 10:00:00")
-    val hwToEdit = testData.homeworks(5)
-    val hwEdited = hwToEdit.copy(startDate = newStartDate, deadlineDate = newDeadlineDate)
+    private val newStartDate = Timestamp.valueOf("2020-12-01 10:00:00")
+    private val newDeadlineDate = Timestamp.valueOf("2020-11-21 10:00:00")
+    private val hwToEdit = testData.homeworks(5)
+    private val hwEdited = hwToEdit.copy(startDate = newStartDate, deadlineDate = newDeadlineDate)
     whenReady(repo.edit(hwToEdit.homeworkId, hwToEdit.name, hwToEdit.description, newStartDate, newDeadlineDate)) { rowsChanged =>
       rowsChanged shouldBe 1
       whenReady(repo.find(hwToEdit.homeworkId)) {
@@ -58,7 +60,7 @@ class HomeworkRepositorySpec extends DatabaseSpecBase{
     private val homeworkToDelete = testData.homeworks(3)
     whenReady(repo.delete(homeworkToDelete.homeworkId)) { rowsChanged =>
       rowsChanged shouldBe 1
-      whenReady(repo.listAll(homeworkToDelete.courseId)) {
+      whenReady(repo.list(homeworkToDelete.courseId)) {
         _.toList shouldBe testData.homeworks.slice(4, 6)
       }
     }

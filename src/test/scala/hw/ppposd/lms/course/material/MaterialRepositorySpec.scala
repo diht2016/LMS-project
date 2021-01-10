@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import hw.ppposd.lms.TestDatabase.testData
 import hw.ppposd.lms.base.DatabaseSpecBase
 
-class MaterialRepositorySpec extends DatabaseSpecBase{
+class MaterialRepositorySpec extends DatabaseSpecBase {
 
   "find" should "return a material with a given id" in new TestWiring {
     private val materialToFind = testData.materials(3)

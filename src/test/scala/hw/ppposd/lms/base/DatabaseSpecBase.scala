@@ -11,13 +11,9 @@ trait DatabaseSpecBase extends SpecBase with BeforeAndAfterEach {
 
   implicit val db: Database = TestDatabase.db
 
-  def whenReady[T](future: Future[T])(action: T => Unit): Unit = {
+  def whenReady[T](future: Future[T])(action: T => Unit): Unit =
     action(Await.result(future, 5.seconds))
-  }
 
-  override def afterEach(): Unit = {
-    Thread.sleep(150) // wait for db connection to close
+  override def afterEach(): Unit =
     TestDatabase.restoreDatabase()
-    Thread.sleep(150) // wait for copying to finish
-  }
 }
