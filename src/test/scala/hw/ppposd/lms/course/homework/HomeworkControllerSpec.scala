@@ -41,6 +41,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     val accessRepoMock: AccessRepository = mock[AccessRepository]
     val homeworkRepoMock: HomeworkRepository = mock[HomeworkRepository]
     val wiringMock: CourseWiring = mock[CourseWiring]
-    val controller = new HomeworkController(homeworkRepoMock, accessRepoMock)
+    val homeworkWiringMock: HomeworkWiring = mock[HomeworkWiring]
+    val controller = new HomeworkController(homeworkRepoMock, accessRepoMock, homeworkWiringMock)
   }
 }

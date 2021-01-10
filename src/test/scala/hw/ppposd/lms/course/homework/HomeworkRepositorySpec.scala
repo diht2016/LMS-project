@@ -6,7 +6,7 @@ import hw.ppposd.lms.TestDatabase.testData
 import hw.ppposd.lms.base.DatabaseSpecBase
 import hw.ppposd.lms.util.Id
 
-class HomeworkRepositorySpec extends DatabaseSpecBase{
+class HomeworkRepositorySpec extends DatabaseSpecBase {
 
   "find" should "find a homework with a given id" in new TestWiring {
     whenReady(repo.find(testData.homeworks(2).homeworkId)) {
