@@ -1,5 +1,6 @@
 package hw.ppposd.lms.group
 
+import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 import slick.jdbc.H2Profile.api._
@@ -11,6 +12,7 @@ trait GroupRepository {
   def find(id: Id[Group]): Future[Option[Group]]
   def list(): Future[Seq[Group]]
   def listGroupStudentIds(groupId: Id[Group]): Future[Seq[Id[User]]]
+  def listGroupsAssignedToCourse(courseId: Id[Course]): Future[Seq[Group]]
 }
 
 class GroupRepositoryImpl(implicit db: Database) extends GroupRepository {
@@ -28,4 +30,14 @@ class GroupRepositoryImpl(implicit db: Database) extends GroupRepository {
 
   override def listGroupStudentIds(groupId: Id[Group]): Future[Seq[Id[User]]] =
     db.run(users.filter(_.groupId === groupId).map(_.id).result)
+
+  override def listGroupsAssignedToCourse(courseId: Id[Course]): Future[Seq[Group]] = {
+    def selectQuery =
+      for {
+        grIdcId <- groupCourseLinks if grIdcId.courseId === courseId
+        gr <- groups if gr.id === grIdcId.groupId
+      } yield gr
+
+    db.run(selectQuery.result)
+  }
 }

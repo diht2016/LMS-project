@@ -16,7 +16,7 @@ case class Homework(homeworkId: Id[Homework],
                     deadlineDate: Timestamp)
 
 object Homework {
-  implicit val userBriefFormat: Writes[Homework] = Json.writes[Homework]
+  implicit val homeworkFormat: Writes[Homework] = Json.writes[Homework]
 }
 
 class HomeworkTable(tag: Tag) extends Table[Homework](tag, "homeworks"){

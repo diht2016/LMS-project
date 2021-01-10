@@ -1,6 +1,7 @@
 package hw.ppposd.lms
 
 import hw.ppposd.lms.auth.{AuthController, AuthRepositoryImpl}
+import hw.ppposd.lms.course.homework.HomeworkWiring
 import hw.ppposd.lms.course.{AccessRepositoryImpl, CourseController, CourseRepositoryImpl, CourseWiringImpl}
 import hw.ppposd.lms.group.{GroupController, GroupRepositoryImpl}
 import hw.ppposd.lms.user.{UserCommonsImpl, UserController, UserRepositoryImpl}
@@ -23,7 +24,7 @@ class RootWiringImpl(implicit db: Database, ec: ExecutionContext) extends RootWi
 
   private val accessRepo = new AccessRepositoryImpl
   private val userCommons = new UserCommonsImpl
-  private val courseWiring = new CourseWiringImpl(accessRepo, userCommons)
+  private val courseWiring = new CourseWiringImpl(accessRepo, userCommons, groupRepo)
 
   override val authController = new AuthController(authRepo)
   override val courseController = new CourseController(courseRepo, userCommons, courseWiring)

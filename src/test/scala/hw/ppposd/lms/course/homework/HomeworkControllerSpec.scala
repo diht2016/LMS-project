@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import hw.ppposd.lms.base.JsonSerializer.toJsonString
 import hw.ppposd.lms.base.RouteSpecBase
-import hw.ppposd.lms.course.AccessRepository
+import hw.ppposd.lms.course.{AccessRepository, CourseWiring}
 import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 
 import scala.concurrent.Future
@@ -107,7 +107,9 @@ class HomeworkControllerSpec extends RouteSpecBase {
   trait TestWiring {
     val accessRepoMock: AccessRepository = mock[AccessRepository]
     val homeworkRepoMock: HomeworkRepository = mock[HomeworkRepository]
-    val controller = new HomeworkController(homeworkRepoMock, accessRepoMock)
+    val wiringMock: CourseWiring = mock[CourseWiring]
+    val homeworkWiringMock: HomeworkWiring = mock[HomeworkWiring]
+    val controller = new HomeworkController(homeworkRepoMock, accessRepoMock, homeworkWiringMock)
     val route: Route = controller.route(sampleUserId, sampleCourseId)
   }
 }

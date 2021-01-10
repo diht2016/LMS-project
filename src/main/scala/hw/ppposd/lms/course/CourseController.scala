@@ -2,7 +2,6 @@ package hw.ppposd.lms.course
 
 import akka.http.scaladsl.server.Route
 import hw.ppposd.lms.Controller
-import hw.ppposd.lms.group.Group
 import hw.ppposd.lms.user.{User, UserCommons, UserTypeMatching}
 import hw.ppposd.lms.util.Id
 

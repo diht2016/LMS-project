@@ -10,14 +10,15 @@ import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
-import play.api.libs.json.Json.{fromJson, toJson}
-import play.api.libs.json.{Format, JsResult, JsValue, Json}
+import play.api.libs.json.{Format, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class HomeworkController(homeworkRepo: HomeworkRepository,
-                         accessRepo: AccessRepository)
+                         accessRepo: AccessRepository,
+                         wiring: HomeworkWiring)
                         (implicit ec: ExecutionContext) extends Controller {
+  import wiring._
 
   def route(userId: Id[User], courseId: Id[Course]): Route = {
     pathEndOrSingleSlash {
@@ -26,11 +27,15 @@ class HomeworkController(homeworkRepo: HomeworkRepository,
       } ~ (post & entity(as[HomeworkEntity])) { entity =>
         checkAccess(userId, courseId) { createHomework(courseId, entity) }
       }
-    } ~ (pathPrefixId[Homework] & pathEnd) { materialId =>
+    } ~ (pathPrefixId[Homework] & pathEnd) { homeworkId =>
       (put & entity(as[HomeworkEntity])) { entity =>
-        checkAccess(userId, courseId) { editHomework(materialId, entity) }
+        checkAccess(userId, courseId) { editHomework(homeworkId, entity) }
       } ~ delete {
-        checkAccess(userId, courseId) { deleteHomework(materialId) }
+        checkAccess(userId, courseId) { deleteHomework(homeworkId) }
+      } ~ {
+        pathPrefix("solutions") {
+          solutionController.route(userId, courseId, homeworkId)
+        }
       }
     }
   }
@@ -68,10 +73,8 @@ object HomeworkController {
                             deadlineDate: Timestamp)
 
   object HomeworkEntity extends PlayJsonSupport {
-    implicit val timestampFormat: Format[Timestamp] = new Format[Timestamp] {
-      def writes(t: Timestamp): JsValue = toJson(t.toLocalDateTime)
-      def reads(json: JsValue): JsResult[Timestamp] = fromJson[LocalDateTime](json).map(Timestamp.valueOf)
-    }
+    import hw.ppposd.lms.util.JsonUtils.timestampFormat
+
     implicit val homeworkEntityFormat: Format[HomeworkEntity] = Json.format[HomeworkEntity]
   }
 }
