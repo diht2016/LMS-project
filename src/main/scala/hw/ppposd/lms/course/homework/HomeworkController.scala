@@ -1,7 +1,6 @@
 package hw.ppposd.lms.course.homework
 
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Route
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
@@ -10,14 +9,15 @@ import hw.ppposd.lms.course.homework.HomeworkController.HomeworkEntity
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
-import play.api.libs.json.Json.{fromJson, toJson}
-import play.api.libs.json.{Format, JsResult, JsValue, Json}
+import play.api.libs.json.{Format, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class HomeworkController(homeworkRepo: HomeworkRepository,
-                         accessRepo: AccessRepository)
+                         accessRepo: AccessRepository,
+                         wiring: HomeworkWiring)
                         (implicit ec: ExecutionContext) extends Controller {
+  import wiring._
 
   def route(userId: Id[User], courseId: Id[Course]): Route = {
     pathEndOrSingleSlash {
@@ -26,11 +26,15 @@ class HomeworkController(homeworkRepo: HomeworkRepository,
       } ~ (post & entity(as[HomeworkEntity])) { entity =>
         checkAccess(userId, courseId) { createHomework(courseId, entity) }
       }
-    } ~ (pathPrefixId[Homework] & pathEnd) { materialId =>
+    } ~ (pathPrefixId[Homework] & pathEnd) { homeworkId =>
       (put & entity(as[HomeworkEntity])) { entity =>
-        checkAccess(userId, courseId) { editHomework(materialId, entity) }
+        checkAccess(userId, courseId) { editHomework(homeworkId, entity) }
       } ~ delete {
-        checkAccess(userId, courseId) { deleteHomework(materialId) }
+        checkAccess(userId, courseId) { deleteHomework(homeworkId) }
+      } ~ {
+        pathPrefix("solutions") {
+          solutionController.route(userId, courseId, homeworkId)
+        }
       }
     }
   }
