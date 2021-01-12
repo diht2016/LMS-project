@@ -89,8 +89,8 @@ class CourseControllerSpec extends RouteSpecBase {
 
 object CourseControllerSpec {
   private val sampleUserId = new Id[User](234)
-  private val sampleGroupId = new Id[Group](26)
-  private val sampleCourseId = new Id[Course](11)
+  private val sampleGroupId = new Id[Group](21)
+  private val sampleCourseId = new Id[Course](31)
   private val sampleCourse = Course(sampleCourseId, "test course", "sample desc")
   private val sampleCourseResponse =
     s"""{"id":${sampleCourseId.value},"name":"test course","description":"sample desc"}"""

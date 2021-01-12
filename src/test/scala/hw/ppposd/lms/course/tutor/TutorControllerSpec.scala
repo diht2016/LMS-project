@@ -142,7 +142,7 @@ object TutorControllerSpec {
   import hw.ppposd.lms.SampleDatabaseContent._
 
   private val sampleUserId = teacher2.id
-  private val sampleCourseId = algebraCourse.id
+  private val sampleCourseId = course1.id
   private val sampleTutorId = student1.id
   private val sampleTutorBrief = UserBrief(student1.id, student1.fullName)
   private val sampleTutorBrief2 = UserBrief(student2.id, student2.fullName)

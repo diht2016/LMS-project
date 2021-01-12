@@ -154,12 +154,12 @@ object MaterialControllerSpec {
   import hw.ppposd.lms.SampleDatabaseContent._
 
   private val sampleUserId = student1.id
-  private val sampleCourseId = materialAlgebra1.courseId
-  private val sampleMaterialId = materialAlgebra1.materialId
-  private val sampleMaterial = materialAlgebra1
+  private val sampleCourseId = material1Course1.courseId
+  private val sampleMaterialId = material1Course1.materialId
+  private val sampleMaterial = material1Course1
   private val sampleMaterialEntity =
     MaterialEntity(sampleMaterial.name, sampleMaterial.description)
-  private val sampleMaterials = Seq(materialAlgebra1, materialAlgebra2)
+  private val sampleMaterials = Seq(material1Course1, material2Course1)
   private val sampleListResponse = toJsonString(sampleMaterials)
   private val errorResponse = """{"error":"not permitted to manage materials"}"""
 }

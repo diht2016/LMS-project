@@ -21,10 +21,10 @@ class HomeworkRepositorySpec extends DatabaseSpecBase {
     }
   }
 
-  "listStarted" should "return homeworks with startDate not greater than current date" in new TestWiring {
+  "listStarted" should "return homeworks with startDate <= current date" in new TestWiring {
     private val now = Timestamp.valueOf("2021-01-05 11:00:00")
     whenReady(repo.listStarted(testData.courses(1).id, now)) {
-      _.toList shouldBe List(testData.homeworks(5))
+      _.toList shouldBe List(testData.homeworks(3), testData.homeworks(4))
     }
   }
 

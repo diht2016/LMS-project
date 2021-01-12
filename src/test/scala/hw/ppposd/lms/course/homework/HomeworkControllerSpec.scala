@@ -118,16 +118,16 @@ object HomeworkControllerSpec {
   import hw.ppposd.lms.SampleDatabaseContent._
 
   private val sampleUserId = student1.id
-  private val sampleCourseId = homeworkAlgebra1.courseId
-  private val sampleHomeworkId = homeworkAlgebra1.homeworkId
-  private val sampleHomework = homeworkAlgebra1
+  private val sampleCourseId = homework1Course1.courseId
+  private val sampleHomeworkId = homework1Course1.homeworkId
+  private val sampleHomework = homework1Course1
   private val sampleHomeworkEntity = HomeworkEntity(
     sampleHomework.name,
     sampleHomework.description,
     sampleHomework.startDate,
     sampleHomework.deadlineDate
   )
-  private val sampleHomeworks = Seq(homeworkAlgebra1, homeworkAlgebra2, homeworkAlgebra3)
+  private val sampleHomeworks = Seq(homework1Course1, homework2Course1, homework3Course1)
   private val sampleListResponse = toJsonString(sampleHomeworks)
   private val errorResponse = """{"error":"not permitted to manage homeworks"}"""
 }
