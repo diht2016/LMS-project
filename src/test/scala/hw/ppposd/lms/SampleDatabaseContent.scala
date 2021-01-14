@@ -2,8 +2,8 @@ package hw.ppposd.lms
 
 import java.sql.Timestamp
 
-import hw.ppposd.lms.auth.AuthUtils
-import hw.ppposd.lms.course.{Course}
+import hw.ppposd.lms.auth.{AuthUtils, Verification}
+import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution
 import hw.ppposd.lms.course.material.Material
@@ -44,6 +44,8 @@ object SampleDatabaseContent {
   val teacher1: User = User(id(11), "test-teacher1", "teacher1@lms.ru", AuthUtils.hashPassword("test-teacher1"), None)
   val teacher2: User = User(id(12), "test-teacher2", "teacher2lms.ru", AuthUtils.hashPassword("test-teacher2"), None)
   val teacher3: User = User(id(13), "test-teacher3", "teacher3@lms.ru", AuthUtils.hashPassword("test-teacher3"), None)
+  val teacherUnregistered: User = User(id(14), "test-teacher3", "", "", None)
+  val verificationT: Verification = Verification("sample-code", id(14))
 
   val personalDataS1: PersonalData = PersonalData(id(1), Some("+79990000001"), Some("Voronezh"), Some("Student"), Some("https://vk.com/stu1"), None, None, None)
   val personalDataS2: PersonalData = PersonalData(id(2), Some("+79990000002"), Some("Tomsk"), Some("Student"), None, None, None, Some("https://instagram/stu2"))
@@ -58,6 +60,7 @@ object SampleDatabaseContent {
   val personalDataT1: PersonalData = PersonalData(id(11), Some("+79990000011"), Some("Kazan"), Some("Teacher of Course 1."), Some("https://vk.com/t1"), Some("https://facebook.com/t1"), None, None)
   val personalDataT2: PersonalData = PersonalData(id(12), Some("+79990000012"), Some("Yakutsk"), Some("Teacher of Course 2."), Some("https://vk.com/t2"), None, Some("https://linkedin.com/t2"), None)
   val personalDataT3: PersonalData = PersonalData(id(13), Some("+79990000013"), Some("Yakutsk"), Some("Teacher of Course 3."), Some("https://vk.com/t3"), None, None, Some("https://instagram/t3"))
+  val personalDataTUnregistered: PersonalData = PersonalData(id(14), None, None, None, None, None, None, None)
 
   val studentData1: StudentData = StudentData(id(1), 2015, Degree.Master, StudyForm.Intramural, LearningBase.Budget)
   val studentData2: StudentData = StudentData(id(2), 2015, Degree.Master, StudyForm.Intramural, LearningBase.Contract)
@@ -161,10 +164,11 @@ object SampleDatabaseContent {
   def fillDatabase(implicit db: Database): TestData = {
     import Schema._
 
-    val coursesFull = insertAndReturnAll(coursesData, courses) //
+    val coursesFull = insertAndReturnAll(coursesData, courses)
     val groupsFull = insertAndReturnAll(groupsData, groups)
     val usersPartiallyFull = concatUsers(groupsFull)
     val usersFull = insertAndReturnAll(usersPartiallyFull, users)
+    val verificationsFull = Seq(verificationT.copy(userId = usersFull(12).id))
 
     val studentDataFull = enrichStudentData(usersFull)
     insertRows(studentDataFull, studentData)
@@ -211,7 +215,9 @@ object SampleDatabaseContent {
       personalDataFull,
       homeworksFull,
       solutionsFull,
-      materialsFull)
+      materialsFull,
+      verificationsFull
+    )
   }
 
   private def concatUsers(groupsFull: Seq[Group]): Seq[User] =
@@ -228,6 +234,7 @@ object SampleDatabaseContent {
       teacher1,
       teacher2,
       teacher3,
+      teacherUnregistered,
     )
 
   private def enrichStudentData(usersFull: Seq[User]): Seq[StudentData] =
@@ -256,7 +263,8 @@ object SampleDatabaseContent {
       personalDataS9.copy(userId = usersFull(8).id),
       personalDataT1.copy(userId = usersFull(9).id),
       personalDataT2.copy(userId = usersFull(10).id),
-      personalDataT3.copy(userId = usersFull(11).id)
+      personalDataT3.copy(userId = usersFull(11).id),
+      personalDataTUnregistered.copy(userId = usersFull(12).id),
     )
 
   private def enrichHomework(coursesFull: Seq[Course]): Seq[Homework] =

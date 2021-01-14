@@ -40,9 +40,10 @@ class AuthRepositoryImpl(implicit db: Database, ec: ExecutionContext) extends Au
   override def destroySession(session: String): Future[Int] =
     db.run(sessions.filter(_.session === session).delete)
 
-  override def createVerification(userId: Id[User]): Future[String] =
-    db.run((verifications returning verifications.map(_.code))
-      += Verification(randomVerificationCode, userId))
+  override def createVerification(userId: Id[User]): Future[String] = {
+    val verification = Verification(randomSession, userId)
+    db.run(verifications += verification).map(_ => verification.code)
+  }
 
   override def findUserIdByVerification(code: String): Future[Option[Id[User]]] =
     db.run(verifications.filter(_.code === code).map(_.userId).result.headOption)

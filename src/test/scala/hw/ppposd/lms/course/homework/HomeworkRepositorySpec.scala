@@ -17,14 +17,14 @@ class HomeworkRepositorySpec extends DatabaseSpecBase {
 
   "list" should "return all homeworks for the course" in new TestWiring {
     whenReady(repo.list(testData.courses(0).id)) {
-      _.toList shouldBe testData.homeworks.slice(0, 3)
+      _ shouldBe testData.homeworks.slice(0, 3)
     }
   }
 
   "listStarted" should "return homeworks with startDate <= current date" in new TestWiring {
     private val now = Timestamp.valueOf("2021-01-05 11:00:00")
     whenReady(repo.listStarted(testData.courses(1).id, now)) {
-      _.toList shouldBe List(testData.homeworks(3), testData.homeworks(4))
+      _ shouldBe List(testData.homeworks(3), testData.homeworks(4))
     }
   }
 
@@ -44,8 +44,8 @@ class HomeworkRepositorySpec extends DatabaseSpecBase {
   }
 
   "edit" should "update fields of a homework if it exists" in new TestWiring {
-    private val newStartDate = Timestamp.valueOf("2020-12-01 10:00:00")
-    private val newDeadlineDate = Timestamp.valueOf("2020-11-21 10:00:00")
+    private val newStartDate = Timestamp.valueOf("2021-02-01 10:00:00")
+    private val newDeadlineDate = Timestamp.valueOf("2021-02-21 10:00:00")
     private val hwToEdit = testData.homeworks(5)
     private val hwEdited = hwToEdit.copy(startDate = newStartDate, deadlineDate = newDeadlineDate)
     whenReady(repo.edit(hwToEdit.homeworkId, hwToEdit.name, hwToEdit.description, newStartDate, newDeadlineDate)) { rowsChanged =>
@@ -60,8 +60,8 @@ class HomeworkRepositorySpec extends DatabaseSpecBase {
     private val homeworkToDelete = testData.homeworks(3)
     whenReady(repo.delete(homeworkToDelete.homeworkId)) { rowsChanged =>
       rowsChanged shouldBe 1
-      whenReady(repo.list(homeworkToDelete.courseId)) {
-        _.toList shouldBe testData.homeworks.slice(4, 6)
+      whenReady(repo.find(homeworkToDelete.homeworkId)) {
+        _ shouldBe None
       }
     }
   }

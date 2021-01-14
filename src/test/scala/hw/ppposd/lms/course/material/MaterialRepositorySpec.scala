@@ -17,7 +17,7 @@ class MaterialRepositorySpec extends DatabaseSpecBase {
 
   "list" should "return all materials for the course" in new TestWiring {
     whenReady(repo.list(testData.courses(0).id)) {
-      _.toList shouldBe testData.materials.slice(0, 2)
+      _ shouldBe testData.materials.slice(0, 2)
     }
   }
 
@@ -69,7 +69,7 @@ class MaterialRepositorySpec extends DatabaseSpecBase {
     whenReady(repo.delete(materialToDelete.materialId)) { rowsChanged =>
       rowsChanged shouldBe 1
       whenReady(repo.list(materialToDelete.courseId)) {
-        _.toList shouldBe testData.materials.slice(2, 4)
+        _ shouldBe testData.materials.slice(2, 4)
       }
     }
   }

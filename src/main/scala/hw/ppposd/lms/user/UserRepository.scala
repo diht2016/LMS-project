@@ -49,5 +49,5 @@ class UserRepositoryImpl(implicit db: Database) extends UserRepository {
     db.run(studentData.filter(_.studentId === id).result.headOption)
 
   override def setPersonalData(data: PersonalData): Future[Int] =
-    db.run(personalData.update(data))
+    db.run(personalData.filter(_.userId === data.userId).update(data))
 }

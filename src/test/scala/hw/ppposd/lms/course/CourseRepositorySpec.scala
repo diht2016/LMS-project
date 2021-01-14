@@ -6,6 +6,19 @@ import hw.ppposd.lms.util.Id
 
 class CourseRepositorySpec extends DatabaseSpecBase {
 
+  "list" should "return all courses" in new TestWiring {
+    whenReady(repo.list()) {
+      _ shouldBe testData.courses
+    }
+  }
+
+  "find" should "return existing course" in new TestWiring {
+    val course = testData.courses.last
+    whenReady(repo.find(course.id)) {
+      _ shouldBe Some(course)
+    }
+  }
+
   "create" should "create new course" in new TestWiring {
     private val newCourse = Course(Id.auto, "temp course", "...")
 
@@ -17,22 +30,8 @@ class CourseRepositorySpec extends DatabaseSpecBase {
     }
   }
 
-  "list" should "return all courses" in new TestWiring {
-    whenReady(repo.list()) {
-      _.toList shouldBe testData.courses
-    }
-  }
-
-  "find" should "return existing course" in new TestWiring {
-    val course = testData.courses.last
-    whenReady(repo.find(course.id)) {
-      _ shouldBe Some(course)
-    }
-  }
-
   trait TestWiring {
     val repo: CourseRepository = new CourseRepositoryImpl
   }
-
 }
 

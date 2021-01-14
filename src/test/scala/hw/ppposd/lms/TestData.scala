@@ -1,5 +1,6 @@
 package hw.ppposd.lms
 
+import hw.ppposd.lms.auth.Verification
 import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution
@@ -16,4 +17,6 @@ case class TestData(users: Seq[User] = Seq(),
                     personalData: Seq[PersonalData] = Seq(),
                     homeworks: Seq[Homework] = Seq(),
                     solutions: Seq[Solution] = Seq(),
-                    materials: Seq[Material] = Seq())
+                    materials: Seq[Material] = Seq(),
+                    verifications: Seq[Verification] = Seq(),
+                   )

@@ -14,6 +14,6 @@ trait DatabaseSpecBase extends SpecBase with BeforeAndAfterEach {
   def whenReady[T](future: Future[T])(action: T => Unit): Unit =
     action(Await.result(future, 5.seconds))
 
-  override def afterEach(): Unit =
-    TestDatabase.restoreDatabase()
+  //override def afterEach(): Unit =
+  //  TestDatabase.restoreDatabase()
 }

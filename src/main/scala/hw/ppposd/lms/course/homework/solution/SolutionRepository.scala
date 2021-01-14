@@ -28,7 +28,4 @@ class SolutionRepositoryImpl(implicit db: Database) extends SolutionRepository {
 
     db.run(deleteQuery.andThen(insertQuery).andThen(findQuery))
   }
-
-
-
 }
