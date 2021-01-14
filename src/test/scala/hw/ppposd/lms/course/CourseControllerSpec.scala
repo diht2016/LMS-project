@@ -16,7 +16,7 @@ class CourseControllerSpec extends RouteSpecBase {
       Future.successful(Some(sampleGroupId))
     courseRepoMock.listGroupCourseIds _ expects sampleGroupId returns
       Future.successful(Seq(sampleCourseId))
-    courseRepoMock.findCourses _ expects Seq(sampleCourseId) returns
+    courseRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
       Future.successful(Seq(sampleCourse))
 
     Get() ~> route ~> check {
@@ -30,7 +30,7 @@ class CourseControllerSpec extends RouteSpecBase {
       Future.successful(None)
     courseRepoMock.listTeacherCourseIds _ expects sampleUserId returns
       Future.successful(Seq(sampleCourseId))
-    courseRepoMock.findCourses _ expects Seq(sampleCourseId) returns
+    courseRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
       Future.successful(Seq(sampleCourse))
 
     Get() ~> route ~> check {

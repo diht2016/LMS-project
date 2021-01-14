@@ -41,7 +41,7 @@ class AuthRepositoryImpl(implicit db: Database, ec: ExecutionContext) extends Au
     db.run(sessions.filter(_.session === session).delete)
 
   override def createVerification(userId: Id[User]): Future[String] = {
-    val verification = Verification(randomSession, userId)
+    val verification = Verification(randomVerificationCode, userId)
     db.run(verifications += verification).map(_ => verification.code)
   }
 

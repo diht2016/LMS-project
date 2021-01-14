@@ -39,6 +39,6 @@ class CourseController(courseRepo: CourseRepository, userCommons: UserCommons, w
     matchUserType(userCommons, userId) (
       ifStudent = groupId => courseRepo.listGroupCourseIds(groupId),
       ifTeacher = courseRepo.listTeacherCourseIds(userId)
-    ).flatMap(courseRepo.findCourses)
+    ).flatMap(courseRepo.enrichCourses)
   }
 }

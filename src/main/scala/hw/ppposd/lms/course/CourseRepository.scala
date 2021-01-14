@@ -14,7 +14,7 @@ trait CourseRepository {
 
   def listTeacherCourseIds(userId: Id[User]): Future[Seq[Id[Course]]]
   def listGroupCourseIds(groupId: Id[Group]): Future[Seq[Id[Course]]]
-  def findCourses(courseIds: Seq[Id[Course]]): Future[Seq[Course]]
+  def enrichCourses(courseIds: Seq[Id[Course]]): Future[Seq[Course]]
 }
 
 class CourseRepositoryImpl(implicit db: Database) extends CourseRepository {
@@ -36,6 +36,6 @@ class CourseRepositoryImpl(implicit db: Database) extends CourseRepository {
   override def listGroupCourseIds(groupId: Id[Group]): Future[Seq[Id[Course]]] =
     db.run(groupCourseLinks.filter(_.groupId === groupId).map(_.courseId).result)
 
-  override def findCourses(courseIds: Seq[Id[Course]]): Future[Seq[Course]] =
+  override def enrichCourses(courseIds: Seq[Id[Course]]): Future[Seq[Course]] =
     db.run(courses.filter(_.id inSet courseIds).result)
 }

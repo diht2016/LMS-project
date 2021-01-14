@@ -5,7 +5,9 @@ import hw.ppposd.lms.course.Course
 import hw.ppposd.lms.course.homework.Homework
 import hw.ppposd.lms.course.homework.solution.Solution
 import hw.ppposd.lms.course.material.Material
-import hw.ppposd.lms.group.Group
+import hw.ppposd.lms.course.teacher.CourseTeacher
+import hw.ppposd.lms.course.tutor.CourseTutor
+import hw.ppposd.lms.group.{Group, GroupCourse}
 import hw.ppposd.lms.user.User
 import hw.ppposd.lms.user.personaldata.PersonalData
 import hw.ppposd.lms.user.studentdata.StudentData
@@ -19,4 +21,7 @@ case class TestData(users: Seq[User] = Seq(),
                     solutions: Seq[Solution] = Seq(),
                     materials: Seq[Material] = Seq(),
                     verifications: Seq[Verification] = Seq(),
+                    courseTeachers: Seq[CourseTeacher] = Seq(),
+                    courseTutors: Seq[CourseTutor] = Seq(),
+                    groupCourses: Seq[GroupCourse] = Seq(),
                    )

@@ -216,7 +216,10 @@ object SampleDatabaseContent {
       homeworksFull,
       solutionsFull,
       materialsFull,
-      verificationsFull
+      verificationsFull,
+      courseTeacherMap,
+      courseTutorMap,
+      groupCourseMap,
     )
   }
 

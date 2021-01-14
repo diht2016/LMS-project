@@ -93,4 +93,3 @@ object AuthRepositorySpec {
   private val sampleEmail = "new.mail@example.com"
   private val samplePasswordHash = "sample password hash"
 }
-
