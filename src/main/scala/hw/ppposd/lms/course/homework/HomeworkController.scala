@@ -19,51 +19,44 @@ class HomeworkController(homeworkRepo: HomeworkRepository,
                          wiring: HomeworkWiring)
                         (implicit ec: ExecutionContext) extends Controller {
   import wiring._
-
-  def route(userId: Id[User], courseId: Id[Course]): Route = {
-    pathEndOrSingleSlash {
+  def route(userId: Id[User], courseId: Id[Course]): Route = pathPrefix("homeworks") {
+    pathEnd {
       get {
         listCourseHomeworks(userId, courseId)
       } ~ (post & entity(as[HomeworkEntity])) { entity =>
-        checkAccess(userId, courseId) { createHomework(courseId, entity) }
+        checkAccess(userId, courseId) accept createHomework(courseId, entity)
       }
-    } ~ (pathPrefixId[Homework] & pathEnd) { homeworkId =>
-      (put & entity(as[HomeworkEntity])) { entity =>
-        checkAccess(userId, courseId) { editHomework(homeworkId, entity) }
-      } ~ delete {
-        checkAccess(userId, courseId) { deleteHomework(homeworkId) }
-      } ~ {
-        pathPrefix("solutions") {
-          solutionController.route(userId, courseId, homeworkId)
+    } ~ pathPrefixId[Homework] { homeworkId =>
+      pathEnd {
+        (put & entity(as[HomeworkEntity])) { entity =>
+          checkAccess(userId, courseId) accept editHomework(homeworkId, entity)
+        } ~ delete {
+          checkAccess(userId, courseId) accept deleteHomework(homeworkId)
         }
-      }
+      } ~ delegate(solutionController.route(userId, courseId, homeworkId))
     }
   }
 
-  def listCourseHomeworks(userId: Id[User], courseId: Id[Course]): Future[Seq[Homework]] =
+  private def listCourseHomeworks(userId: Id[User], courseId: Id[Course]): Future[Seq[Homework]] =
     accessRepo.isCourseTeacher(userId, courseId).flatMap {
       case true => homeworkRepo.list(courseId)
       case false => homeworkRepo.listStarted(courseId, Timestamp.valueOf(LocalDateTime.now))
     }
 
-  def createHomework(courseId: Id[Course], entity: HomeworkEntity): Future[Id[Homework]] =
+  private def createHomework(courseId: Id[Course], entity: HomeworkEntity): Future[Id[Homework]] =
     homeworkRepo.add(courseId, entity.name, entity.description, entity.startDate, entity.deadlineDate)
 
-  def editHomework(homeworkId: Id[Homework], entity: HomeworkEntity): Future[Unit] =
+  private def editHomework(homeworkId: Id[Homework], entity: HomeworkEntity): Future[Unit] =
     homeworkRepo.edit(homeworkId, entity.name, entity.description, entity.startDate, entity.deadlineDate)
       .flatMap(assertSingleUpdate)
 
-  def deleteHomework(homeworkId: Id[Homework]): Future[Unit] =
+  private def deleteHomework(homeworkId: Id[Homework]): Future[Unit] =
     homeworkRepo.delete(homeworkId)
       .flatMap(assertSingleUpdate)
 
-  private def canManageHomeworks(userId: Id[User], courseId: Id[Course]): Future[Boolean] =
-    accessRepo.isCourseTeacher(userId, courseId)
-
-  private def checkAccess[T](userId: Id[User], courseId: Id[Course]): (=> Future[T]) => Future[T] =
-    checkCondition(ApiError(403, "not permitted to manage homeworks")) {
-      canManageHomeworks(userId, courseId)
-    }
+  private def checkAccess(userId: Id[User], courseId: Id[Course]): Future[Unit] =
+    assertTrue(accessRepo.isCourseTeacher(userId, courseId),
+      ApiError(403, "not permitted to manage homeworks"))
 }
 
 object HomeworkController {

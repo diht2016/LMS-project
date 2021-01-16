@@ -33,14 +33,14 @@
   - change password using old password (password should be hard)
     - `PUT /auth/change-password (oldPassword, newPassword)`
   - edit own PersonalData (phone and links are validated)
-    - `PATCH /users/me/personal (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
+    - `PUT /users/me/personal (phoneNumber, city, description, vk, facebook, linkedin, instagram)`
   - view other User data and PersonalData (except learningBase)
     - `GET /users/{user.id}`
 * Student
   - view list of group courses
     - `GET /courses`
   - view list of group students
-    - `GET /group`
+    - `GET /groups/my`
 * Teacher
   - view list of leading courses
     - `GET /courses`

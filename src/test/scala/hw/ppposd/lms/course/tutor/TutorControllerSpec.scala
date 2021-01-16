@@ -18,7 +18,7 @@ class TutorControllerSpec extends RouteSpecBase {
     userCommonsMock.enrichUsers _ expects sampleTutorIds returns
       Future.successful(sampleTutorBriefs)
 
-    Get() ~> route ~> check {
+    Get("/tutors") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleListResponse
     }
@@ -32,7 +32,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Post(s"/$sampleTutorId") ~> route ~> check {
+    Post(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -46,7 +46,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Post(s"/$sampleTutorId") ~> route ~> check {
+    Post(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.NotFound
       responseAs[String] shouldBe errorNotFoundResponse
     }
@@ -58,7 +58,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(false)
 
-    Post(s"/$sampleTutorId") ~> route ~> check {
+    Post(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe errorBadIdResponse
     }
@@ -70,7 +70,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Post(s"/$sampleTutorId") ~> route ~> check {
+    Post(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorAccessResponse
     }
@@ -84,7 +84,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Delete(s"/$sampleTutorId") ~> route ~> check {
+    Delete(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -98,7 +98,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Delete(s"/$sampleTutorId") ~> route ~> check {
+    Delete(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.NotFound
       responseAs[String] shouldBe errorNotFoundResponse
     }
@@ -110,7 +110,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(false)
 
-    Delete(s"/$sampleTutorId") ~> route ~> check {
+    Delete(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe errorBadIdResponse
     }
@@ -122,7 +122,7 @@ class TutorControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseStudent _).expects (sampleTutorId, sampleCourseId) returns
       Future.successful(true)
 
-    Delete(s"/$sampleTutorId") ~> route ~> check {
+    Delete(s"/tutors/$sampleTutorId") ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorAccessResponse
     }

@@ -17,7 +17,7 @@ class TeacherControllerSpec extends RouteSpecBase {
     userCommonsMock.enrichUsers _ expects sampleTeacherIds returns
       Future.successful(sampleTeacherBriefs)
 
-    Get() ~> route ~> check {
+    Get("/teachers") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleListResponse
     }

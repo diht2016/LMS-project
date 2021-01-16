@@ -47,7 +47,7 @@ class AuthControllerSpec extends RouteSpecBase {
     authRepoMock.createSession _ expects sampleUserId returns
       Future.successful(sampleSession)
 
-    PostJson("/login", sampleLoginEntity) ~> controller.route ~> check {
+    PostJson("/auth/login", sampleLoginEntity) ~> controller.route ~> check {
       status shouldBe StatusCodes.OK
       header(sessionHeaderName) shouldBe Some(sessionHeader)
       responseAs[String] shouldBe okResponse
@@ -59,7 +59,7 @@ class AuthControllerSpec extends RouteSpecBase {
       Future.successful(None)
     (authRepoMock.createSession _ expects *).never()
 
-    PostJson("/login", sampleLoginEntity) ~> controller.route ~> check {
+    PostJson("/auth/login", sampleLoginEntity) ~> controller.route ~> check {
       status shouldBe StatusCodes.Unauthorized
       header(sessionHeaderName) shouldBe None
       responseAs[String] shouldBe """{"error":"login failed"}"""
@@ -74,7 +74,7 @@ class AuthControllerSpec extends RouteSpecBase {
     (authRepoMock.setAuthPair _).expects(sampleUserId, sampleEmail, sampleHash) returns
       Future.successful(1)
 
-    PostJson("/register", sampleRegisterEntity) ~> controller.route ~> check {
+    PostJson("/auth/register", sampleRegisterEntity) ~> controller.route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -84,7 +84,7 @@ class AuthControllerSpec extends RouteSpecBase {
     authRepoMock.findUserIdByVerification _ expects sampleCode returns
       Future.successful(None)
 
-    PostJson("/register", sampleRegisterEntity) ~> controller.route ~> check {
+    PostJson("/auth/register", sampleRegisterEntity) ~> controller.route ~> check {
       status shouldBe StatusCodes.Unauthorized
       responseAs[String] shouldBe """{"error":"invalid verification code"}"""
     }
@@ -93,7 +93,7 @@ class AuthControllerSpec extends RouteSpecBase {
   it should "respond with 400 if password is weak" in new TestWiring {
     (authRepoMock.findUserIdByVerification _ expects sampleCode).never()
 
-    PostJson("/register", sampleRegisterEntity.copy(password = sampleWeakPassword)) ~>
+    PostJson("/auth/register", sampleRegisterEntity.copy(password = sampleWeakPassword)) ~>
       controller.route ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe """{"error":"password is too weak"}"""
@@ -103,7 +103,7 @@ class AuthControllerSpec extends RouteSpecBase {
   it should "respond with 400 if email is incorrect" in new TestWiring {
     (authRepoMock.findUserIdByVerification _ expects sampleCode).never()
 
-    PostJson("/register", sampleRegisterEntity.copy(email = sampleBadEmail)) ~>
+    PostJson("/auth/register", sampleRegisterEntity.copy(email = sampleBadEmail)) ~>
       controller.route ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe """{"error":"email is not valid"}"""
@@ -118,7 +118,7 @@ class AuthControllerSpec extends RouteSpecBase {
     (authRepoMock.setPasswordHash _).expects(sampleUserId, sampleNewHash) returns
       Future.successful(1)
 
-    PostJson("/change-password", samplePasswordEntity) ~>
+    PostJson("/auth/change-password", samplePasswordEntity) ~>
       sessionHeader ~> controller.route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
@@ -131,7 +131,7 @@ class AuthControllerSpec extends RouteSpecBase {
     authRepoMock.getPasswordHash _ expects sampleUserId returns
       Future.successful(sampleHash)
 
-    PostJson("/change-password", samplePasswordEntity.copy(oldPassword = sampleNewPassword)) ~>
+    PostJson("/auth/change-password", samplePasswordEntity.copy(oldPassword = sampleNewPassword)) ~>
       sessionHeader ~> controller.route ~> check {
       status shouldBe StatusCodes.Unauthorized
       responseAs[String] shouldBe """{"error":"old passwords do not match"}"""
@@ -142,7 +142,7 @@ class AuthControllerSpec extends RouteSpecBase {
     authRepoMock.findUserIdBySession _ expects sampleSession returns
       Future.successful(Some(sampleUserId))
 
-    PostJson("/change-password", samplePasswordEntity.copy(newPassword = sampleWeakPassword)) ~>
+    PostJson("/auth/change-password", samplePasswordEntity.copy(newPassword = sampleWeakPassword)) ~>
       sessionHeader ~> controller.route ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe """{"error":"new password is too weak"}"""
@@ -152,7 +152,7 @@ class AuthControllerSpec extends RouteSpecBase {
   it should "respond with 401 if user is not logged in" in new TestWiring {
     (authRepoMock.findUserIdBySession _ expects *).never()
 
-    PostJson("/change-password", samplePasswordEntity) ~> controller.route ~> check {
+    PostJson("/auth/change-password", samplePasswordEntity) ~> controller.route ~> check {
       status shouldBe StatusCodes.Unauthorized
       responseAs[String] shouldBe """{"error":"session header is not provided"}"""
     }

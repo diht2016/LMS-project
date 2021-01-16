@@ -9,13 +9,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class GroupController(groupRepo: GroupRepository, userCommons: UserCommons)
                      (implicit ec: ExecutionContext) extends Controller with UserTypeMatching {
-  def route(userId: Id[User]): Route = {
-    (pathEndOrSingleSlash & get) {
+  def route(userId: Id[User]): Route = pathPrefix("groups") {
+    (path("my") & get) {
       listSameGroupStudents(userId)
     }
   }
 
-  def listSameGroupStudents(userId: Id[User]): Future[Seq[UserBrief]] = {
+  private def listSameGroupStudents(userId: Id[User]): Future[Seq[UserBrief]] = {
     matchUserType(userCommons, userId) (
       ifStudent = groupId =>
         groupRepo.listGroupStudentIds(groupId)

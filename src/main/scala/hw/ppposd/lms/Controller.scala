@@ -1,13 +1,31 @@
 package hw.ppposd.lms
 
-import akka.http.scaladsl.server.{Directive1, Directives, Route}
-import hw.ppposd.lms.util.Id
+import akka.http.scaladsl.server._
+import hw.ppposd.lms.util.{FutureUtils, Id}
 import play.api.libs.json.{Json, Writes}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
+import scala.language.implicitConversions
 import scala.util.{Failure, Success}
 
-trait Controller extends Directives {
+trait Controller extends Directives with FutureUtils {
+  /**
+   * Directive which evaluates its content lazily, only if needed.
+   *
+   * Example:
+   * {{{
+   *   concat(
+   *     someNonLazyRoute,
+   *     otherNonLazyRoute,
+   *     delegate(computeHeavyRoute(someArgs))
+   *   )
+   * }}}
+   *
+   * Here, function `computeHeavyRoute` won't be called
+   * unless both routes above get processed and rejected.
+   */
+  val delegate: Directive0 = Directive { inner => ctx => inner(())(ctx) }
+
   /**
    * Directive which extracts [[Id]] of given type `A` from request path.
    *
@@ -87,22 +105,4 @@ trait Controller extends Directives {
     case Some(t) => Future.successful(t)
     case None => ApiError(404, s"$name not found")
   }
-
-  def lookupIfSome[A, B](opt: Option[A], f: A => Future[Option[B]]): Future[Option[B]] = opt match {
-    case Some(a) => f(a)
-    case None => Future.successful(None)
-  }
-
-  def lookupIfNeeded[A, B](opt: Option[A], f: => Future[Option[B]]): Future[Option[B]] = opt match {
-    case Some(_) => f
-    case None => Future.successful(None)
-  }
-
-  def assertTrue[T](conditionFuture: Future[Boolean], error: => Future[T])
-                   (input: T)(implicit ec: ExecutionContext): Future[T] =
-    conditionFuture.flatMap { if (_) Future.successful(input) else error }
-
-  def checkCondition[T](error: => Future[T])(conditionFuture: Future[Boolean])
-                       (input: => Future[T])(implicit ec: ExecutionContext): Future[T] =
-    conditionFuture.flatMap { if (_) input else error }
 }

@@ -1,6 +1,5 @@
 package hw.ppposd.lms.auth
 
-import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.SecureRandom
 
@@ -10,12 +9,11 @@ object AuthUtils {
   private val salt = ConfigFactory.load().getString("auth.password-salt")
   private val hashingInstance = MessageDigest.getInstance("SHA-256")
   private val randomInstance = new SecureRandom
+  private val hexChars = "0123456789abcdef"
 
   def hashPassword(password: String): String = {
     val saltedPassword = password + salt
-    hashingInstance
-      .digest(saltedPassword.getBytes("UTF-8"))
-      .map("%02x".format(_)).mkString
+    bytesToHex(hashingInstance.digest(saltedPassword.getBytes("UTF-8")))
   }
 
   def isPasswordStrongEnough(password: String): Boolean =
@@ -30,6 +28,18 @@ object AuthUtils {
 
   def randomVerificationCode: String = randomString(32)
 
-  private def randomString(length: Int): String =
-    new BigInteger(length * 5, randomInstance).toString(32)
+  private def randomString(length: Int): String = {
+    val bytes = new Array[Byte](length / 2)
+    randomInstance.nextBytes(bytes)
+    bytesToHex(bytes)
+  }
+
+  private def bytesToHex(bytes: Array[Byte]): String = {
+    val builder = new StringBuilder
+    bytes.foreach { b =>
+      builder.append(hexChars((b >> 4) & 15))
+      builder.append(hexChars(b & 15))
+    }
+    builder.toString()
+  }
 }

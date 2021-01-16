@@ -21,20 +21,20 @@ class SolutionController(accessRepo: AccessRepository,
                          userCommons: UserCommons)
                         (implicit ec: ExecutionContext) extends Controller {
 
-  def route(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework]): Route = {
-    pathEndOrSingleSlash {
-      get {
-        getSolutionInfoListForTeacher(userId, courseId, homeworkId)
-      } ~ (post & entity(as[String])) { text =>
-        uploadSolution(userId, courseId, homeworkId, text)
+  def route(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework]): Route =
+    pathPrefix("solutions") {
+      pathEnd {
+        get {
+          getSolutionInfoListForTeacher(userId, courseId, homeworkId)
+        } ~ (post & entity(as[String])) { text =>
+          uploadSolution(userId, courseId, homeworkId, text)
+        }
+      } ~ (pathPrefixId[User] & pathEnd & get) { studentId =>
+        getSolutionText(userId, courseId, studentId, homeworkId)
       }
-    } ~ (pathPrefixId[User] & pathEnd & get) { studentId =>
-      getSolutionText(userId, courseId, studentId, homeworkId)
     }
 
-  }
-
-  def getSolutionText(userId: Id[User], courseId: Id[Course], studentId: Id[User], homeworkId: Id[Homework]): Future[Option[String]] =
+  private def getSolutionText(userId: Id[User], courseId: Id[Course], studentId: Id[User], homeworkId: Id[Homework]): Future[Option[String]] =
     for {
       isCourseTeacher <- accessRepo.isCourseTeacher(userId, courseId)
       maybeSolution <-
@@ -45,7 +45,7 @@ class SolutionController(accessRepo: AccessRepository,
         }
     } yield maybeSolution.map(_.text)
 
-  def uploadSolution(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework], text: String): Future[Solution] =
+  private def uploadSolution(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework], text: String): Future[Solution] =
     for {
       isCourseStudent <- accessRepo.isCourseStudent(userId, courseId)
       maybeHomework <- homeworkRepo.find(homeworkId)
@@ -63,8 +63,7 @@ class SolutionController(accessRepo: AccessRepository,
         }
     } yield solution
 
-
-  def getSolutionInfoListForTeacher(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework]): Future[Seq[GroupSolutionsInfo]] = {
+  private def getSolutionInfoListForTeacher(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework]): Future[Seq[GroupSolutionsInfo]] = {
     def getStudentSolutionInfo(userBrief: UserBrief, homeworkId: Id[Homework]): Future[StudentSolutionInfo] =
         solutionRepo.find(homeworkId, userBrief.id).map(maybeSol => StudentSolutionInfo(userBrief, maybeSol.nonEmpty))
 
@@ -86,7 +85,6 @@ class SolutionController(accessRepo: AccessRepository,
         }
     } yield solutionInfoList
   }
-
 }
 
 object SolutionController {

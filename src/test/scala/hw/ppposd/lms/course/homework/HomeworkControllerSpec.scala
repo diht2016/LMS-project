@@ -18,7 +18,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    Get() ~> route ~> check {
+    Get("/homeworks") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleListResponse
     }
@@ -30,7 +30,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    Get() ~> route ~> check {
+    Get("/homeworks") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleListResponse
     }
@@ -43,7 +43,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    PostJson("/", sampleHomeworkEntity) ~> route ~> check {
+    PostJson("/homeworks", sampleHomeworkEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleHomeworkId.toString
     }
@@ -53,7 +53,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PostJson("/", sampleHomeworkEntity) ~> route ~> check {
+    PostJson("/homeworks", sampleHomeworkEntity) ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }
@@ -66,7 +66,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    PutJson(s"/$sampleHomeworkId", sampleHomeworkEntity) ~> route ~> check {
+    PutJson(s"/homeworks/$sampleHomeworkId", sampleHomeworkEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -76,7 +76,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PutJson(s"/$sampleHomeworkId", sampleHomeworkEntity) ~> route ~> check {
+    PutJson(s"/homeworks/$sampleHomeworkId", sampleHomeworkEntity) ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }
@@ -88,7 +88,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    Delete(s"/$sampleHomeworkId") ~> route ~> check {
+    Delete(s"/homeworks/$sampleHomeworkId") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -98,7 +98,7 @@ class HomeworkControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    Delete(s"/$sampleHomeworkId") ~> route ~> check {
+    Delete(s"/homeworks/$sampleHomeworkId") ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }

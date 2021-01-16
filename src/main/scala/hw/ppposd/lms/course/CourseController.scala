@@ -10,32 +10,24 @@ import scala.concurrent.{ExecutionContext, Future}
 class CourseController(courseRepo: CourseRepository, userCommons: UserCommons, wiring: CourseWiring)
                       (implicit ec: ExecutionContext) extends Controller with UserTypeMatching {
   import wiring._
-  def route(userId: Id[User]): Route = {
-    (pathEndOrSingleSlash & get) {
+  def route(userId: Id[User]): Route = pathPrefix("courses") {
+    (pathEnd & get) {
       listUserCourses(userId)
-    } ~ pathPrefixId[Course] { courseId => concat (
+    } ~ pathPrefixId[Course] { courseId => concat(
       (pathEnd & get) {
         getCourse(courseId)
       },
-      (path("teachers") & get) {
-        teacherController.route(userId, courseId)
-      },
-      pathPrefix("tutors") {
-        tutorController.route(userId, courseId)
-      },
-      pathPrefix("materials") {
-        materialController.route(userId, courseId)
-      },
-      pathPrefix("homeworks") {
-        homeworkController.route(userId, courseId)
-      },
+      delegate(teacherController.route(userId, courseId)),
+      delegate(tutorController.route(userId, courseId)),
+      delegate(materialController.route(userId, courseId)),
+      delegate(homeworkController.route(userId, courseId)),
     )}
   }
 
-  def getCourse(courseId: Id[Course]): Future[Course] =
+  private def getCourse(courseId: Id[Course]): Future[Course] =
     courseRepo.find(courseId).flatMap(assertFound("course"))
 
-  def listUserCourses(userId: Id[User]): Future[Seq[Course]] = {
+  private def listUserCourses(userId: Id[User]): Future[Seq[Course]] = {
     matchUserType(userCommons, userId) (
       ifStudent = groupId => courseRepo.listGroupCourseIds(groupId),
       ifTeacher = courseRepo.listTeacherCourseIds(userId)

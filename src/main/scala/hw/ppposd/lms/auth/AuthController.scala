@@ -14,7 +14,7 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
   import AuthController._
   import AuthUtils._
 
-  def route: Route = concat(
+  def route: Route = pathPrefix("auth") apply concat(
     (path("login") & post & entity(as[LoginEntity])) { entity =>
       futureToResponse(
         login(entity),

@@ -22,7 +22,7 @@ class UserControllerSpec extends RouteSpecBase {
     groupRepoMock.find _ expects sampleGroupId returns
       Future.successful(Some(sampleGroup))
 
-    Get("/me") ~> controller.route(sampleStudentId) ~> check {
+    Get("/users/me") ~> controller.route(sampleStudentId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleStudentResponseFull
     }
@@ -36,7 +36,7 @@ class UserControllerSpec extends RouteSpecBase {
     (userRepoMock.findStudentData _ expects *).never()
     (groupRepoMock.find _ expects *).never()
 
-    Get("/me") ~> controller.route(sampleTeacherId) ~> check {
+    Get("/users/me") ~> controller.route(sampleTeacherId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleTeacherResponse
     }
@@ -52,7 +52,7 @@ class UserControllerSpec extends RouteSpecBase {
     groupRepoMock.find _ expects sampleGroupId returns
       Future.successful(Some(sampleGroup))
 
-    Get(s"/${sampleStudentId.value}") ~> controller.route(sampleObserverId) ~> check {
+    Get(s"/users/${sampleStudentId.value}") ~> controller.route(sampleObserverId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleStudentResponseHidden
       sampleStudentResponseHidden shouldBe sampleStudentResponseHiddenOtherWay
@@ -67,7 +67,7 @@ class UserControllerSpec extends RouteSpecBase {
     (userRepoMock.findStudentData _ expects *).never()
     (groupRepoMock.find _ expects *).never()
 
-    Get(s"/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
+    Get(s"/users/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleTeacherResponse
     }
@@ -80,7 +80,7 @@ class UserControllerSpec extends RouteSpecBase {
     private val sampleResponse =
       s"""{"error":"user not found"}"""
 
-    Get(s"/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
+    Get(s"/users/${sampleTeacherId.value}") ~> controller.route(sampleObserverId) ~> check {
       status shouldBe StatusCodes.NotFound
       responseAs[String] shouldBe sampleResponse
     }
@@ -90,7 +90,7 @@ class UserControllerSpec extends RouteSpecBase {
     userRepoMock.setPersonalData _ expects samplePersonalData returns
       Future.successful(1)
 
-    PatchJson("/me/personal", samplePersonalDataEntity) ~>
+    PutJson("/users/me/personal", samplePersonalDataEntity) ~>
       controller.route(sampleTeacherId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
@@ -101,7 +101,7 @@ class UserControllerSpec extends RouteSpecBase {
     userRepoMock.setPersonalData _ expects samplePersonalDataEmpty returns
       Future.successful(1)
 
-    PatchJson("/me/personal", samplePersonalDataEntityEmpty) ~>
+    PutJson("/users/me/personal", samplePersonalDataEntityEmpty) ~>
       controller.route(sampleTeacherId) ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
@@ -114,13 +114,13 @@ class UserControllerSpec extends RouteSpecBase {
     private def errorResponse(message: String) =
       s"""{"error":"$message"}"""
 
-    PatchJson("/me/personal", samplePersonalDataEntity.copy(phoneNumber = Some("123"))) ~>
+    PutJson("/users/me/personal", samplePersonalDataEntity.copy(phoneNumber = Some("123"))) ~>
       controller.route(sampleTeacherId) ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe errorResponse("invalid phone number")
     }
 
-    PatchJson("/me/personal", samplePersonalDataEntity.copy(vk = Some("https://example.com/test"))) ~>
+    PutJson("/users/me/personal", samplePersonalDataEntity.copy(vk = Some("https://example.com/test"))) ~>
       controller.route(sampleTeacherId) ~> check {
       status shouldBe StatusCodes.BadRequest
       responseAs[String] shouldBe errorResponse("invalid vk link")

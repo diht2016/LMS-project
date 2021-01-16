@@ -16,7 +16,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     materialRepoMock.list _ expects sampleCourseId returns
       Future.successful(sampleMaterials)
 
-    Get() ~> route ~> check {
+    Get("/materials") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleListResponse
     }
@@ -30,7 +30,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+    PostJson("/materials", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleMaterialId.toString
     }
@@ -44,7 +44,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+    PostJson("/materials", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleMaterialId.toString
     }
@@ -56,7 +56,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PostJson("/", sampleMaterialEntity) ~> route ~> check {
+    PostJson("/materials", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }
@@ -70,7 +70,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+    PutJson(s"/materials/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -84,7 +84,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+    PutJson(s"/materials/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -96,7 +96,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    PutJson(s"/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
+    PutJson(s"/materials/$sampleMaterialId", sampleMaterialEntity) ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }
@@ -110,7 +110,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    Delete(s"/$sampleMaterialId") ~> route ~> check {
+    Delete(s"/materials/$sampleMaterialId") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -124,7 +124,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
 
-    Delete(s"/$sampleMaterialId") ~> route ~> check {
+    Delete(s"/materials/$sampleMaterialId") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe okResponse
     }
@@ -136,7 +136,7 @@ class MaterialControllerSpec extends RouteSpecBase {
     (accessRepoMock.isCourseTutor _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(false)
 
-    Delete(s"/$sampleMaterialId") ~> route ~> check {
+    Delete(s"/materials/$sampleMaterialId") ~> route ~> check {
       status shouldBe StatusCodes.Forbidden
       responseAs[String] shouldBe errorResponse
     }

@@ -19,7 +19,7 @@ class CourseControllerSpec extends RouteSpecBase {
     courseRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
       Future.successful(Seq(sampleCourse))
 
-    Get() ~> route ~> check {
+    Get("/courses") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleCoursesResponse
     }
@@ -33,7 +33,7 @@ class CourseControllerSpec extends RouteSpecBase {
     courseRepoMock.enrichCourses _ expects Seq(sampleCourseId) returns
       Future.successful(Seq(sampleCourse))
 
-    Get() ~> route ~> check {
+    Get("/courses") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleCoursesResponse
     }
@@ -43,7 +43,7 @@ class CourseControllerSpec extends RouteSpecBase {
     courseRepoMock.find _ expects sampleCourseId returns
       Future.successful(Some(sampleCourse))
 
-    Get(s"/${sampleCourseId.value}") ~> route ~> check {
+    Get(s"/courses/${sampleCourseId.value}") ~> route ~> check {
       status shouldBe StatusCodes.OK
       responseAs[String] shouldBe sampleCourseResponse
     }
@@ -56,7 +56,7 @@ class CourseControllerSpec extends RouteSpecBase {
     private val sampleResponse =
       s"""{"error":"course not found"}"""
 
-    Get(s"/${sampleCourseId.value}") ~> route ~> check {
+    Get(s"/courses/${sampleCourseId.value}") ~> route ~> check {
       status shouldBe StatusCodes.NotFound
       responseAs[String] shouldBe sampleResponse
     }

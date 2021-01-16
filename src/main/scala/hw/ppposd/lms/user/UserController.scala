@@ -12,11 +12,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController(userRepo: UserRepository, groupRepo: GroupRepository)
                     (implicit ec: ExecutionContext) extends Controller {
   import UserEntityMapping._
-  def route(userId: Id[User]): Route = {
+
+  def route(userId: Id[User]): Route = pathPrefix("users") {
     pathPrefix("me") {
       (pathEnd & get) {
         getUserData(userId, isSelf = true)
-      } ~ (path("personal") & patch & entity(as[PersonalDataEntity])) { entity =>
+      } ~ (path("personal") & put & entity(as[PersonalDataEntity])) { entity =>
         setPersonalData(userId, entity)
       }
     } ~ (pathPrefixId[User] & pathEnd & get) { otherUserId =>

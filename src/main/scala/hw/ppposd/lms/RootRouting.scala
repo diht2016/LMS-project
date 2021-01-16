@@ -7,17 +7,9 @@ import scala.concurrent.ExecutionContext
 class RootRouting(wiring: RootWiring)(implicit ec: ExecutionContext) extends Controller {
   import wiring._
   def route: Route =
-    pathPrefix("auth") {
-      authController.route
-    } ~ authController.userSession { userId => concat(
-      pathPrefix("courses") {
-        courseController.route(userId)
-      },
-      pathPrefix("group") {
-        groupController.route(userId)
-      },
-      pathPrefix("users") {
-        userController.route(userId)
-      },
+    authController.route ~ authController.userSession { userId => concat(
+      courseController.route(userId),
+      groupController.route(userId),
+      userController.route(userId),
     )}
 }
