@@ -11,12 +11,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class TeacherController(teacherRepo: TeacherRepository, userCommons: UserCommons)
                        (implicit ec: ExecutionContext) extends Controller {
   def route(userId: Id[User], courseId: Id[Course]): Route = {
-    (pathEnd & get) {
-      listCourseTutorBriefs(courseId)
+    (pathEndOrSingleSlash & get) {
+      listCourseTeacherBriefs(courseId)
     }
   }
 
-  def listCourseTutorBriefs(courseId: Id[Course]): Future[Seq[UserBrief]] =
-    teacherRepo.listCourseTutorIds(courseId)
+  def listCourseTeacherBriefs(courseId: Id[Course]): Future[Seq[UserBrief]] =
+    teacherRepo.listCourseTeacherIds(courseId)
       .flatMap(userCommons.enrichUsers)
 }

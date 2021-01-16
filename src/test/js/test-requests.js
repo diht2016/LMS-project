@@ -13,10 +13,10 @@ async function request(method, url, body='') {
   console.log(response.status, text)
 }
 
-async function login(email='i.kozlov@lms.ru', password='test-student1') {
+async function login(email='student1@lms.ru', password='test-student1') {
   let response = await requestCore('POST', '/auth/login', {email, password})
   headers['session'] = response.headers.get('session')
-  console.log('logged in with session', headers['session'])
+  console.log('logged in with session token', headers['session'])
   //console.log('headers', Array.from(response.headers))
 }
 

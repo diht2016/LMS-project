@@ -22,7 +22,7 @@ class MaterialRepositorySpec extends DatabaseSpecBase {
   }
 
   "add" should "create a new material" in new TestWiring {
-    private val before = Timestamp.valueOf(LocalDateTime.now)
+    private val before = Timestamp.valueOf(LocalDateTime.now.minusSeconds(1))
     private val newName = "new material name"
     private val newDescription = "new material"
 

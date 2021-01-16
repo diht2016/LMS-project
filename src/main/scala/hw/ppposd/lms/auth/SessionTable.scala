@@ -4,11 +4,11 @@ import hw.ppposd.lms.user.User
 import hw.ppposd.lms.util.Id
 import slick.jdbc.H2Profile.api._
 
-case class Session(session: String, userId: Id[User])
+case class Session(token: String, userId: Id[User])
 
 class SessionTable(tag: Tag) extends Table[Session](tag, "sessions") {
-  def session = column[String]("session", O.PrimaryKey)
+  def token = column[String]("token", O.PrimaryKey)
   def userId = column[Id[User]]("userId")
 
-  def * = (session, userId) .<> (Session.tupled, Session.unapply)
+  def * = (token, userId) .<> (Session.tupled, Session.unapply)
 }

@@ -137,7 +137,6 @@ class TutorControllerSpec extends RouteSpecBase {
   }
 }
 
-
 object TutorControllerSpec {
   import hw.ppposd.lms.SampleDatabaseContent._
 

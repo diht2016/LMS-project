@@ -18,15 +18,15 @@ object AuthUtils {
       .map("%02x".format(_)).mkString
   }
 
-  def isPasswordStrongEnough(password: String): Boolean = {
-    password.length >= 10
-  }
+  def isPasswordStrongEnough(password: String): Boolean =
+    password
+      .replaceAll("(?i)(qwerty|asd|p[a4@][s$]+w[o0]rd|123(45?)?|(\\w)\\3{2,})", "_")
+      .length >= 10
 
-  def isEmailValid(email: String): Boolean = {
-    email.matches("^\\S+@\\S+\\.\\S+$")
-  }
+  def isEmailValid(email: String): Boolean =
+    email.matches("^[\\w.-]+@[\\w-]+(\\.[\\w-]+)+$")
 
-  def randomSession: String = randomString(64)
+  def randomSessionToken: String = randomString(64)
 
   def randomVerificationCode: String = randomString(32)
 

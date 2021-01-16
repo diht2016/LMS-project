@@ -18,7 +18,7 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
     (path("login") & post & entity(as[LoginEntity])) { entity =>
       futureToResponse(
         login(entity),
-        (session: String) => respondWithHeaders(RawHeader(sessionHeaderName, session)) {
+        (token: String) => respondWithHeaders(RawHeader(sessionHeaderName, token)) {
           successResponse
         }
       )
@@ -35,7 +35,7 @@ class AuthController(authRepo: AuthRepository)(implicit ec: ExecutionContext) ex
 
   def userSession(innerRoute: Id[User] => Route): Route =
     optionalHeaderValueByName(sessionHeaderName) {
-      case Some(session) => onSuccess(authRepo.findUserIdBySession(session)) {
+      case Some(token) => onSuccess(authRepo.findUserIdBySession(token)) {
         case Some(userId) => innerRoute(userId)
         case None => ApiError(401, "invalid session")
       }

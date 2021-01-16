@@ -10,18 +10,21 @@ import scala.concurrent.Future
 trait TeacherRepository {
   def add(courseId: Id[Course], userId: Id[User]): Future[Int]
   def delete(courseId: Id[Course], userId: Id[User]): Future[Int]
-  def listCourseTutorIds(courseId: Id[Course]): Future[Seq[Id[User]]]
+  def listCourseTeacherIds(courseId: Id[Course]): Future[Seq[Id[User]]]
 }
 
 class TeacherRepositoryImpl(implicit db: Database) extends TeacherRepository {
   import hw.ppposd.lms.Schema._
 
-  override def add(courseId: Id[Course], userId: Id[User]): Future[Int] =
-    db.run(courseTeacherLinks += CourseTeacher(courseId, userId))
+  override def add(courseId: Id[Course], userId: Id[User]): Future[Int] = {
+    val deleteQuery = courseTeacherLinks.filter(t => t.courseId === courseId && t.teacherId === userId).delete
+    val insertQuery = courseTeacherLinks += CourseTeacher(courseId, userId)
+    db.run(deleteQuery.andThen(insertQuery))
+  }
 
   override def delete(courseId: Id[Course], userId: Id[User]): Future[Int] =
     db.run(courseTeacherLinks.filter(t => t.courseId === courseId && t.teacherId === userId).delete)
 
-  override def listCourseTutorIds(courseId: Id[Course]): Future[Seq[Id[User]]] =
+  override def listCourseTeacherIds(courseId: Id[Course]): Future[Seq[Id[User]]] =
     db.run(courseTeacherLinks.filter(_.courseId === courseId).map(_.teacherId).result)
 }

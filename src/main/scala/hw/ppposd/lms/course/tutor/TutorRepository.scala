@@ -16,8 +16,11 @@ trait TutorRepository {
 class TutorRepositoryImpl(implicit db: Database) extends TutorRepository {
   import hw.ppposd.lms.Schema._
 
-  override def add(courseId: Id[Course], userId: Id[User]): Future[Int] =
-    db.run(courseTutorLinks += CourseTutor(courseId, userId))
+  override def add(courseId: Id[Course], userId: Id[User]): Future[Int] = {
+    val deleteQuery = courseTutorLinks.filter(t => t.courseId === courseId && t.studentId === userId).delete
+    val insertQuery = courseTutorLinks += CourseTutor(courseId, userId)
+    db.run(deleteQuery.andThen(insertQuery))
+  }
 
   override def delete(courseId: Id[Course], userId: Id[User]): Future[Int] =
     db.run(courseTutorLinks.filter(t => t.courseId === courseId && t.studentId === userId).delete)

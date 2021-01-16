@@ -9,9 +9,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AuthRepository {
   def createSession(userId: Id[User]): Future[String]
-  def findUserIdBySession(session: String): Future[Option[Id[User]]]
+  def findUserIdBySession(token: String): Future[Option[Id[User]]]
   def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]]
-  def destroySession(session: String): Future[Int]
+  def destroySession(token: String): Future[Int]
 
   def createVerification(userId: Id[User]): Future[String]
   def findUserIdByVerification(code: String): Future[Option[Id[User]]]
@@ -26,19 +26,19 @@ class AuthRepositoryImpl(implicit db: Database, ec: ExecutionContext) extends Au
   import hw.ppposd.lms.Schema._
 
   override def createSession(userId: Id[User]): Future[String] = {
-    val session = Session(randomSession, userId)
-    db.run(sessions += session).map(_ => session.session)
+    val session = Session(randomSessionToken, userId)
+    db.run(sessions += session).map(_ => session.token)
   }
 
-  override def findUserIdBySession(session: String): Future[Option[Id[User]]] =
-    db.run(sessions.filter(_.session === session).map(_.userId).result.headOption)
+  override def findUserIdBySession(token: String): Future[Option[Id[User]]] =
+    db.run(sessions.filter(_.token === token).map(_.userId).result.headOption)
 
   override def findUserIdByAuthPair(email: String, passwordHash: String): Future[Option[Id[User]]] =
     db.run(users.filter(u => u.email === email && u.passwordHash === passwordHash)
       .map(_.id).result.headOption)
 
-  override def destroySession(session: String): Future[Int] =
-    db.run(sessions.filter(_.session === session).delete)
+  override def destroySession(token: String): Future[Int] =
+    db.run(sessions.filter(_.token === token).delete)
 
   override def createVerification(userId: Id[User]): Future[String] = {
     val verification = Verification(randomVerificationCode, userId)
