@@ -20,7 +20,7 @@ class GroupController(groupRepo: GroupRepository, userCommons: UserCommons)
       ifStudent = groupId =>
         groupRepo.listGroupStudentIds(groupId)
           .flatMap(userCommons.enrichUsers),
-      ifTeacher = ApiError(401, "teachers do not belong to any group")
+      ifTeacher = ApiError(404, "teachers do not belong to any group")
     )
   }
 }

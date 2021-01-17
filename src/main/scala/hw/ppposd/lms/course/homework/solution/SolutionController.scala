@@ -69,7 +69,7 @@ class SolutionController(accessRepo: AccessRepository,
         .flatMap(users => Future.sequence(users.map(u => getStudentSolutionInfo(u, homeworkId))))
         .map(GroupSolutionsInfo(group, _))
 
-    groupRepo.listGroupsAssignedToCourse(courseId)
+    groupRepo.listCourseGroups(courseId)
       .flatMap(groups => Future.sequence(groups.map(getGroupSolutionInfo)))
   }
 

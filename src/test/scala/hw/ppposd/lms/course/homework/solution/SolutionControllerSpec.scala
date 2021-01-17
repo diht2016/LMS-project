@@ -27,7 +27,7 @@ class SolutionControllerSpec extends RouteSpecBase {
   it should "return grouped list of students' solutions if user is a teacher" in new TestWiring {
     (accessRepoMock.isCourseTeacher _).expects (sampleUserId, sampleCourseId) returns
       Future.successful(true)
-    (groupRepoMock.listGroupsAssignedToCourse _).expects (sampleCourseId) returns
+    (groupRepoMock.listCourseGroups _).expects (sampleCourseId) returns
       Future.successful(groupsAssignedToCourse2)
     (groupRepoMock.listGroupStudentIds _).expects (groupsAssignedToCourse2(0).id) returns
       Future.successful(group1Students.map(_.id))
