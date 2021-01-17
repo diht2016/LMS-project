@@ -1,16 +1,18 @@
 package hw.ppposd.lms.course.homework.solution
 
+import java.sql.Timestamp
 import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Route
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import hw.ppposd.lms.Controller
-import hw.ppposd.lms.course.homework.solution.SolutionController.{GroupSolutionsInfo, StudentSolutionInfo}
+import hw.ppposd.lms.course.homework.solution.SolutionController.{GroupSolutionsInfo, SolutionEntity, StudentSolutionInfo}
 import hw.ppposd.lms.course.homework.{Homework, HomeworkRepository}
 import hw.ppposd.lms.course.{AccessRepository, Course}
 import hw.ppposd.lms.group.{Group, GroupRepository}
 import hw.ppposd.lms.user.{User, UserBrief, UserCommons}
 import hw.ppposd.lms.util.Id
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Format, Json, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,11 +28,12 @@ class SolutionController(accessRepo: AccessRepository,
       pathEnd {
         get {
           getSolutionInfoListForTeacher(userId, courseId, homeworkId)
-        } ~ (post & entity(as[String])) { text =>
-          uploadSolution(userId, courseId, homeworkId, text)
+        } ~ (post & entity(as[SolutionEntity])) { sol =>
+          uploadSolution(userId, courseId, homeworkId, sol.text)
         }
       } ~ (pathPrefixId[User] & pathEnd & get) { studentId =>
         getSolutionText(userId, courseId, studentId, homeworkId)
+
       }
     }
 
@@ -47,11 +50,13 @@ class SolutionController(accessRepo: AccessRepository,
 
   private def uploadSolution(userId: Id[User], courseId: Id[Course], homeworkId: Id[Homework], text: String): Future[Solution] =
     for {
+      maybeHomework <- homeworkRepo.findAndCheckAvailability(homeworkId, Timestamp.valueOf(LocalDateTime.now()))
+      _ <- if (maybeHomework.isEmpty) ApiError(404, s"Homework with id=$homeworkId does not exists.") else Future.unit
+      _ <- maybeHomework match {
+        case Some((_, true)) => Future.unit
+        case _ => ApiError(403, "Homework is not available for solving")
+      }
       isCourseStudent <- accessRepo.isCourseStudent(userId, courseId)
-      maybeHomework <- homeworkRepo.find(homeworkId)
-      _ <- if (maybeHomework.isEmpty) ApiError(404, s"Homework with id=$homeworkId does not exits.") else Future.unit
-      isHomeworkOpened = maybeHomework.exists(hw => hw.deadlineDate.toLocalDateTime.isAfter(LocalDateTime.now()))
-      _ <- if (!isHomeworkOpened) ApiError(403, "Homework deadline has been already passed.") else Future.unit
       solution <-
         if (isCourseStudent ) {
           solutionRepo.set(homeworkId, userId, text).flatMap{
@@ -81,7 +86,7 @@ class SolutionController(accessRepo: AccessRepository,
           groupRepo.listGroupsAssignedToCourse(courseId)
             .flatMap(groups => Future.sequence(groups.map(getGroupSolutionInfo)))
         } else {
-          ApiError(403, "User is not a teacher of the course")
+          ApiError(403, "User is not a teacher of a course")
         }
     } yield solutionInfoList
   }
@@ -96,5 +101,10 @@ object SolutionController {
   case class GroupSolutionsInfo(group: Group, studentSolutions: Seq[StudentSolutionInfo])
   object GroupSolutionsInfo {
     implicit val groupSolutionsInfoFormat: Writes[GroupSolutionsInfo] = Json.writes[GroupSolutionsInfo]
+  }
+
+  case class SolutionEntity(text: String)
+  object SolutionEntity extends PlayJsonSupport {
+    implicit val solutionEntityFormat: Format[SolutionEntity] = Json.format[SolutionEntity]
   }
 }

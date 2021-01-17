@@ -1,6 +1,7 @@
 package hw.ppposd.lms.course.homework
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 import hw.ppposd.lms.Schema._
 import hw.ppposd.lms.course.Course
@@ -23,7 +24,7 @@ trait HomeworkRepository {
            startDate: Timestamp,
            deadlineDate: Timestamp): Future[Int]
   def delete(homeworkId: Id[Homework]): Future[Int]
-  def find(id: Id[Homework]): Future[Option[Homework]]
+  def findAndCheckAvailability(id: Id[Homework], now: Timestamp): Future[Option[(Homework, Boolean)]]
 }
 
 class HomeworkRepositoryImpl(implicit db: Database) extends HomeworkRepository {
@@ -57,6 +58,6 @@ class HomeworkRepositoryImpl(implicit db: Database) extends HomeworkRepository {
   override def delete(homeworkId: Id[Homework]): Future[Int] =
     db.run(homeworks.filter(_.homeworkId === homeworkId).delete)
 
-  override def find(id: Id[Homework]): Future[Option[Homework]] =
-    db.run(homeworks.filter(_.homeworkId === id).result.headOption)
+  override def findAndCheckAvailability(id: Id[Homework], now: Timestamp): Future[Option[(Homework, Boolean)]] =
+    db.run(homeworks.filter(_.homeworkId === id).map(hw => (hw, hw.deadlineDate >= now && hw.startDate <= now)).result.headOption)
 }
