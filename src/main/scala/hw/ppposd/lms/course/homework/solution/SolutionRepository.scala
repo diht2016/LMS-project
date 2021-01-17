@@ -14,18 +14,16 @@ import scala.concurrent.Future
 trait SolutionRepository {
   def find(homeworkId: Id[Homework], studentId: Id[User]): Future[Option[Solution]]
 
-  def set(homeworkId: Id[Homework], studentId: Id[User], text: String): Future[Option[Solution]]
+  def set(homeworkId: Id[Homework], studentId: Id[User], text: String): Future[Int]
 }
 
 class SolutionRepositoryImpl(implicit db: Database) extends SolutionRepository {
   override def find(homeworkId: Id[Homework], studentId: Id[User]): Future[Option[Solution]] =
     db.run(solutions.filter(s => s.homeworkId === homeworkId && s.studentId === studentId).result.headOption)
 
-  override def set(homeworkId: Id[Homework], studentId: Id[User], text: String): Future[Option[Solution]] = {
+  override def set(homeworkId: Id[Homework], studentId: Id[User], text: String): Future[Int] = {
     val deleteQuery = solutions.filter(s => s.homeworkId === homeworkId && s.studentId === studentId).delete
     val insertQuery = solutions += Solution(homeworkId, studentId, text, Timestamp.valueOf(LocalDateTime.now()))
-    val findQuery = solutions.filter(s => s.homeworkId === homeworkId && s.studentId === studentId).result.headOption
-
-    db.run(deleteQuery.andThen(insertQuery).andThen(findQuery))
+    db.run(deleteQuery.andThen(insertQuery))
   }
 }
